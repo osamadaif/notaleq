@@ -112,8 +112,9 @@ class _NumpadKeyState extends State<NumpadKey> {
     if (widget.family == NumpadKeyFamily.commit) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('↵', style: AppTextStyles.keyCommit.copyWith(fontSize: 18.sp, color: fg)),
+          Center(child: Text('↵', style: AppTextStyles.keyCommit.copyWith(fontSize: 24.sp, color: fg))),
           SizedBox(width: AppSpacing.sm),
           if (widget.label != null)
             Text(widget.label!,
