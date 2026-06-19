@@ -1,0 +1,34 @@
+# flutter_launcher_icons — generates the native Android & iOS launcher icons
+# from the brand masters in app-icon-exports/ (the Claude Design hand-off).
+#
+# Re-run after changing any master:
+#   dart run flutter_launcher_icons
+#
+# Masters (do not bake OS corners in — the launchers mask them):
+#   ios-1024-light.png             opaque 1024² brand tile (base + iOS light)
+#   ios-1024-dark.png              transparent (iOS 18 dark appearance)
+#   ios-1024-tinted.png            grayscale on black (iOS 18 tinted appearance)
+#   android-adaptive-foreground    432² transparent mark (inside the 66dp safe zone)
+#   android-adaptive-background    432² brand tile
+flutter_launcher_icons:
+  # Base master — the opaque square tile. Used for the legacy Android launcher
+  # icon (API < 26) and as the iOS source.
+  image_path: "app-icon-exports/ios-1024-light.png"
+
+  # ---- Android ----
+  android: "ic_launcher"
+  min_sdk_android: 21
+  # Adaptive icon (API 26+): two 108dp layers; key art stays in the 66dp centre.
+  adaptive_icon_background: "app-icon-exports/android-adaptive-background.png"
+  adaptive_icon_foreground: "app-icon-exports/android-adaptive-foreground.png"
+  # Android 13+ themed icon — the mark silhouette, tinted by the OS wallpaper.
+  adaptive_icon_monochrome: "app-icon-exports/android-adaptive-foreground.png"
+
+  # ---- iOS ----
+  ios: true
+  # The App Store rejects alpha; the light master is fully opaque, so flattening
+  # is lossless.
+  remove_alpha_ios: true
+  # iOS 18 appearance variants (flutter_launcher_icons >= 0.14).
+  image_path_ios_dark_transparent: "app-icon-exports/ios-1024-dark.png"
+  image_path_ios_tinted_grayscale: "app-icon-exports/ios-1024-tinted.png"
