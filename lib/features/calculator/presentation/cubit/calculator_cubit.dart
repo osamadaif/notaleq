@@ -56,6 +56,14 @@ class CalculatorCubit extends Cubit<CalculatorState> {
   void inputOperator(String op) {
     final active = state.activeLine;
     if (active == null) return;
+    // A leading × / ÷ joins this line to the running total *above* it; the first
+    // value line has nothing above, so `0 × n` / `0 ÷ n` would just zero the
+    // total. Block it there — only a sign (+ / −) may lead the first line.
+    if (active.rawExpression.isEmpty &&
+        !state.requiresLeadingOperator &&
+        _isMulDiv(op)) {
+      return;
+    }
     // An extra operator on a complete line (already holding its one binary
     // operator) descends to a new line, written with that operator at its start.
     if (ExpressionInput.atOperatorCap(active.rawExpression)) {
@@ -64,6 +72,10 @@ class CalculatorCubit extends Cubit<CalculatorState> {
     }
     _editActiveRaw((raw) => ExpressionInput.appendOperator(raw, op));
   }
+
+  /// A multiply/divide key (in either glyph or ASCII form).
+  static bool _isMulDiv(String op) =>
+      op == '×' || op == '*' || op == '÷' || op == '/';
 
   void inputParen(String paren) {
     if (_rejectLeadingNonOperator()) return;
@@ -79,8 +91,23 @@ class CalculatorCubit extends Cubit<CalculatorState> {
   /// on a line that must still begin with an operator.
   bool _rejectLeadingNonOperator() {
     if (!state.requiresLeadingOperator) return false;
-    emit(state.copyWith(operatorNoticeTick: state.operatorNoticeTick + 1));
+    emit(state.copyWith(
+      focused: true,
+      operatorNoticeTick: state.operatorNoticeTick + 1,
+    ));
     return true;
+  }
+
+  /// `=` — blurs the active line so the sheet reads as a settled result with no
+  /// focused row. The running total is already live, so it settles nothing else.
+  void unfocus() => emit(state.copyWith(focused: false, commentEditing: false));
+
+  /// Re-engages editing after [unfocus]: settles the current line onto a fresh
+  /// one if it's complete, otherwise just re-focuses it in place.
+  void _refocus() {
+    if (state.focused) return;
+    emit(state.copyWith(focused: true));
+    commit(); // now focused → commits if the line is complete, else no-ops
   }
 
   void _commitWithLeadingOperator(String op) {
@@ -91,6 +118,7 @@ class CalculatorCubit extends Cubit<CalculatorState> {
     emit(state.copyWith(
       lines: lines,
       activeIndex: newIndex,
+      focused: true,
       commentEditing: false,
     ));
     _persist();
@@ -122,6 +150,7 @@ class CalculatorCubit extends Cubit<CalculatorState> {
     emit(state.copyWith(
       lines: lines,
       activeIndex: state.activeIndex - 1,
+      focused: true,
       commentEditing: false,
     ));
     _persist();
@@ -139,6 +168,7 @@ class CalculatorCubit extends Cubit<CalculatorState> {
     emit(state.copyWith(
       lines: [LedgerLine.empty()],
       activeIndex: 0,
+      focused: true,
       commentEditing: false,
     ));
     final id = state.calculationId;
@@ -150,6 +180,11 @@ class CalculatorCubit extends Cubit<CalculatorState> {
   void commit() {
     final active = state.activeLine;
     if (active == null) return;
+    // Tapping/committing while blurred (after `=`) re-engages instead.
+    if (!state.focused) {
+      _refocus();
+      return;
+    }
     // A comment with no amount isn't kept: discard it and stay on a fresh line.
     if (active.hasComment && !active.hasExpression) {
       _replaceActive(LedgerLine.empty());
@@ -161,6 +196,7 @@ class CalculatorCubit extends Cubit<CalculatorState> {
     emit(state.copyWith(
       lines: lines,
       activeIndex: state.activeIndex + 1,
+      focused: true,
       commentEditing: false,
     ));
     _persist();
@@ -181,7 +217,7 @@ class CalculatorCubit extends Cubit<CalculatorState> {
   void setActive(int index) {
     if (index < 0 || index >= state.lines.length) return;
     if (index == state.activeIndex) {
-      emit(state.copyWith(commentEditing: false));
+      emit(state.copyWith(focused: true, commentEditing: false));
       return;
     }
     // A comment with no amount must be resolved first — can't focus away from it.
@@ -201,12 +237,14 @@ class CalculatorCubit extends Cubit<CalculatorState> {
     emit(state.copyWith(
       lines: lines,
       activeIndex: target,
+      focused: true,
       commentEditing: false,
     ));
     _persist();
   }
 
-  void startCommentEditing() => emit(state.copyWith(commentEditing: true));
+  void startCommentEditing() =>
+      emit(state.copyWith(focused: true, commentEditing: true));
   void stopCommentEditing() => emit(state.copyWith(commentEditing: false));
 
   /// Comment editing (system keyboard).
@@ -245,7 +283,7 @@ class CalculatorCubit extends Cubit<CalculatorState> {
   void _replaceActive(LedgerLine line) {
     final lines = [...state.lines];
     lines[state.activeIndex] = line;
-    emit(state.copyWith(lines: lines));
+    emit(state.copyWith(lines: lines, focused: true));
     _persist();
   }
 

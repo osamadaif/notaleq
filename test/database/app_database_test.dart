@@ -48,6 +48,22 @@ void main() {
     expect(history.map((c) => c.id), contains(id));
   });
 
+  test('name search escapes LIKE wildcards', () async {
+    final a = await db.calculationsDao.createDraft();
+    await db.calculationsDao.saveAs(a, 'a%b');
+    final b = await db.calculationsDao.createDraft();
+    await db.calculationsDao.saveAs(b, 'axxb');
+
+    // "%" is matched literally, so only the exact "a%b" comes back (an
+    // unescaped wildcard would also match "axxb").
+    final hits = await db.calculationsDao.watchSavedSheetsByName('a%b').first;
+    expect(hits.map((c) => c.name), ['a%b']);
+
+    // A plain substring query still matches both.
+    final both = await db.calculationsDao.watchSavedSheetsByName('b').first;
+    expect(both.map((c) => c.name).toSet(), {'a%b', 'axxb'});
+  });
+
   test('deleting a sheet cascades to its lines', () async {
     final id = await db.calculationsDao.createDraft();
     await db.linesDao.insertLine(

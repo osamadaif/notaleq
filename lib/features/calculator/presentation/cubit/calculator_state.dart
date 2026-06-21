@@ -26,6 +26,11 @@ sealed class CalculatorState with _$CalculatorState {
     /// keyboard up, numpad swapped out).
     @Default(false) bool commentEditing,
 
+    /// Whether a line is currently focused (the enlarged, caret-lit active row).
+    /// Pressing `=` blurs it (`false`) so the sheet reads as a settled result;
+    /// any edit or tap re-engages it (`true`).
+    @Default(true) bool focused,
+
     /// Bumped each time a non-operator key is rejected on a line that still
     /// needs a leading operator — the screen shows a quick notice.
     @Default(0) int operatorNoticeTick,

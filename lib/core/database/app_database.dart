@@ -135,12 +135,23 @@ class CalculationsDao extends DatabaseAccessor<AppDatabase>
         .watch();
   }
 
-  /// Saved sheets filtered by a name query, newest first.
+  /// Saved sheets filtered by a name query, newest first. The `%` / `_` LIKE
+  /// wildcards (and the escape char itself) are escaped so a query containing
+  /// them matches literally instead of acting as a wildcard.
   Stream<List<Calculation>> watchSavedSheetsByName(String query) {
-    return (select(calculations)
-          ..where((c) => c.isDraft.equals(0) & c.name.like('%$query%'))
-          ..orderBy([(c) => OrderingTerm.desc(c.updatedAt)]))
-        .watch();
+    final escaped = query
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_');
+    return customSelect(
+      'SELECT * FROM calculations '
+      "WHERE is_draft = 0 AND name LIKE ?1 ESCAPE '\\' "
+      'ORDER BY updated_at DESC',
+      variables: [Variable.withString('%$escaped%')],
+      readsFrom: {calculations},
+    ).watch().map(
+          (rows) => rows.map((row) => calculations.map(row.data)).toList(),
+        );
   }
 
   /// Caches the latest total and bumps `updatedAt`.

@@ -41,6 +41,34 @@ void main() {
       const sixteen = '1234567890123456';
       expect(ExpressionInput.appendDigit(sixteen, '7'), sixteen);
     });
+    test('caps the fractional part at 8 digits', () {
+      expect(ExpressionInput.appendDigit('0.1234567', '8'), '0.12345678');
+      const eight = '0.12345678';
+      expect(ExpressionInput.appendDigit(eight, '9'), eight); // at the cap
+    });
+  });
+
+  group('leading zero', () {
+    test('a bare 0 does not grow into 00', () =>
+        expect(ExpressionInput.appendDigit('0', '0'), '0'));
+    test('000 is impossible', () {
+      var raw = ExpressionInput.appendDigit('', '0'); // '0'
+      raw = ExpressionInput.appendDigit(raw, '0'); // still '0'
+      raw = ExpressionInput.appendDigit(raw, '0'); // still '0'
+      expect(raw, '0');
+    });
+    test('first significant digit replaces the bare 0', () =>
+        expect(ExpressionInput.appendDigit('0', '5'), '5'));
+    test('bare 0 after an operator is replaced too', () =>
+        expect(ExpressionInput.appendDigit('100+0', '7'), '100+7'));
+    test('a leading-minus bare 0 is replaced, keeping the sign', () =>
+        expect(ExpressionInput.appendDigit('-0', '5'), '-5'));
+    test('0. keeps appending zeros (legitimate 0.00)', () {
+      expect(ExpressionInput.appendDigit('0.', '0'), '0.0');
+      expect(ExpressionInput.appendDigit('0.0', '0'), '0.00');
+    });
+    test('10 is unaffected (trailing 0 is significant)', () =>
+        expect(ExpressionInput.appendDigit('10', '0'), '100'));
   });
 
   group('percent', () {

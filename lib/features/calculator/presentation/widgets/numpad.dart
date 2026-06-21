@@ -32,6 +32,7 @@ class Numpad extends StatelessWidget {
     this.onBackspace,
     this.onCommentJump,
     this.onCommit,
+    this.onEquals,
     this.operatorsEnabled = true,
     this.numbersEnabled = true,
     this.hapticEnabled = true,
@@ -53,7 +54,14 @@ class Numpad extends StatelessWidget {
   final VoidCallback? onClearAll;
   final VoidCallback? onBackspace;
   final VoidCallback? onCommentJump;
+
+  /// The wide commit bar — commits the line and descends to a new one.
   final VoidCallback? onCommit;
+
+  /// The `=` key. The running total is always live, so `=` settles nothing and
+  /// does **not** add a line; it's kept only for the muscle-memory tap at the
+  /// end (it still gives the usual key feedback).
+  final VoidCallback? onEquals;
 
   final bool operatorsEnabled;
 
@@ -155,6 +163,7 @@ class Numpad extends StatelessWidget {
           ),
           const SizedBox(height: _gap),
           // Commit bar: wide "new line" + an "=" key sitting under the "+".
+          // Only the wide bar adds a line; "=" is a no-op kept for habit.
           Row(
             children: [
               Expanded(
@@ -172,7 +181,7 @@ class Numpad extends StatelessWidget {
                   family: NumpadKeyFamily.operatorKey,
                   label: '=',
                   height: AppSizes.keyCommitHeight,
-                  onPressed: _tap(onCommit),
+                  onPressed: _tap(onEquals),
                 ),
               ),
             ],

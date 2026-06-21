@@ -96,6 +96,11 @@ class _CalculatorViewState extends State<_CalculatorView> {
   /// Settled-line amount: the operand prefixed by its join (+ / − / × / ÷). The
   /// first/base line (no leading operator) shows the bare value.
   String _settledAmount(LedgerLine line, int decimalPlaces) {
+    // An excluded (error) line shows what was typed — not its zeroed value —
+    // next to the "excluded" pill, so the user can see what failed.
+    if (line.isHardError) {
+      return _formatter.formatExpression(line.rawExpression);
+    }
     final value = _formatter.format(
       line.computedValue,
       decimalPlaces: decimalPlaces,
@@ -225,6 +230,9 @@ class _CalculatorViewState extends State<_CalculatorView> {
             final cubit = context.read<CalculatorCubit>();
             final settings = context.watch<SettingsCubit>().state;
             final dp = settings.decimalPlaces;
+            // The running total walks every line — compute (and format) it once
+            // per build and share it between the top bar and the total bar.
+            final totalText = _formatter.format(state.total, decimalPlaces: dp);
             // True keyboard height (readable because the Scaffold no longer
             // hides the inset). Rebuilds each animation frame so the spacer
             // tracks the keyboard smoothly.
@@ -242,9 +250,7 @@ class _CalculatorViewState extends State<_CalculatorView> {
                     title: state.isDraft
                         ? context.tr(LangKeys.draft)
                         : state.sheetName!,
-                    meta:
-                        '${state.contentLineCount} · '
-                        '${_formatter.format(state.total, decimalPlaces: dp)}',
+                    meta: '${state.contentLineCount} · $totalText',
                     onHistory: () => _onHistory(context),
                     onSave: () => _onSave(context, state),
                     onSettings: () =>
@@ -261,10 +267,7 @@ class _CalculatorViewState extends State<_CalculatorView> {
                   ),
                   child: TotalBar(
                     label: context.tr(LangKeys.total),
-                    totalText: _formatter.format(
-                      state.total,
-                      decimalPlaces: dp,
-                    ),
+                    totalText: totalText,
                     currency: _currencySymbol(context, settings.currencyCode),
                   ),
                 ),
@@ -292,6 +295,10 @@ class _CalculatorViewState extends State<_CalculatorView> {
                       onBackspace: cubit.backspace,
                       onClearAll: () => _onClearAll(context),
                       onCommit: cubit.commit,
+                      // "=" doesn't add a line (the total is live); it just
+                      // blurs the active row so the sheet reads as a settled
+                      // result. The next edit or tap re-engages it.
+                      onEquals: cubit.unfocus,
                       onCommentJump: () {
                         // Toggle between the comment (system keyboard) and the
                         // amount (numpad).
@@ -343,7 +350,9 @@ class _CalculatorViewState extends State<_CalculatorView> {
               );
             }
             final line = state.lines[index];
-            final active = index == state.activeIndex;
+            // After `=` the active line is blurred: nothing renders as the
+            // enlarged active row.
+            final active = index == state.activeIndex && state.focused;
             if (active) {
               return _ActiveLine(
                 line: line,
@@ -358,6 +367,9 @@ class _CalculatorViewState extends State<_CalculatorView> {
                 onAmountTap: () => _commentFocus.unfocus(),
               );
             }
+            // A blank line is only ever the (now blurred) trailing active line —
+            // hide it instead of rendering a stray "0" row.
+            if (line.isBlank) return const SizedBox.shrink();
             if (line.isSectionHeader) {
               return LedgerRow.sectionHeader(
                 title: line.comment!,

@@ -175,6 +175,80 @@ void main() {
     expect(cubit.state.total, Decimal.parse('-50'));
   });
 
+  test('the first line cannot start with × or ÷ (nothing above to join)',
+      () async {
+    await cubit.load();
+    cubit.inputOperator('×'); // blocked
+    expect(cubit.state.activeLine!.rawExpression, isEmpty);
+    cubit.inputOperator('÷'); // blocked
+    expect(cubit.state.activeLine!.rawExpression, isEmpty);
+
+    // A sign still leads, and × works as a *binary* operator once there's a
+    // value to its left.
+    cubit
+      ..inputDigit('5')
+      ..inputOperator('×')
+      ..inputDigit('2');
+    expect(cubit.state.activeLine!.rawExpression, '5*2');
+    expect(cubit.state.total, Decimal.parse('10'));
+  });
+
+  group('= (blur / re-engage)', () {
+    test('= blurs the active line without adding one', () async {
+      await cubit.load();
+      cubit
+        ..inputDigit('1')
+        ..inputDigit('0')
+        ..inputDigit('0');
+      cubit.unfocus();
+      expect(cubit.state.focused, isFalse);
+      expect(cubit.state.lines.length, 1); // no new line
+      expect(cubit.state.total, Decimal.parse('100')); // total untouched
+    });
+
+    test('typing after = re-focuses and keeps editing the same line', () async {
+      await cubit.load();
+      cubit
+        ..inputDigit('5')
+        ..unfocus();
+      expect(cubit.state.focused, isFalse);
+      cubit.inputDigit('0'); // a key press re-engages
+      expect(cubit.state.focused, isTrue);
+      expect(cubit.state.activeLine!.rawExpression, '50');
+    });
+
+    test('committing while blurred settles onto a fresh focused line', () async {
+      await cubit.load();
+      cubit
+        ..inputDigit('1')
+        ..inputDigit('0')
+        ..inputDigit('0')
+        ..unfocus();
+      cubit.commit(); // re-engages: 100 settles, a new line opens
+      expect(cubit.state.focused, isTrue);
+      expect(cubit.state.lines.length, 2);
+      expect(cubit.state.activeIndex, 1);
+      expect(cubit.state.lines[0].rawExpression, '100');
+    });
+
+    test('tapping a row while blurred focuses it', () async {
+      await cubit.load();
+      cubit
+        ..inputDigit('1')
+        ..inputDigit('0')
+        ..inputDigit('0');
+      cubit.commit();
+      cubit
+        ..inputOperator('+')
+        ..inputDigit('5'); // line1 = +5
+      cubit.unfocus();
+      expect(cubit.state.focused, isFalse);
+      cubit.setActive(0);
+      expect(cubit.state.focused, isTrue);
+      expect(cubit.state.activeIndex, 0);
+    });
+  });
+
   test('tape: a ×-line multiplies the running total', () async {
     await cubit.load();
     cubit

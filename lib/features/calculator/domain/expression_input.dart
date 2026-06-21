@@ -7,6 +7,11 @@ class ExpressionInput {
   /// Max integer digits allowed in a single number.
   static const int maxIntegerDigits = 16;
 
+  /// Max fractional digits allowed after the decimal point. Comfortably above
+  /// the largest display rounding the user can pick (`decimal_places` ≤ 6), so
+  /// it never clips a visible digit while still bounding `0.000…001`-style runs.
+  static const int maxFractionDigits = 8;
+
   /// Appends a digit, or a decimal point (one per number; a leading `.` becomes
   /// `0.`). Caps a number's integer part at [maxIntegerDigits].
   static String appendDigit(String raw, String digit) {
@@ -17,8 +22,20 @@ class ExpressionInput {
       return '$raw.';
     }
     final current = _currentNumber(raw);
-    if (!current.contains('.') && current.length >= maxIntegerDigits) {
-      return raw;
+    // Leading-zero collapse (Samsung-style): a bare "0" integer part never grows
+    // into "00"/"000"; the first significant digit replaces it ("0" then "5" →
+    // "5"). "0." / "0.0" already hold a decimal point, so they keep appending.
+    if (current == '0') {
+      return digit == '0' ? raw : raw.substring(0, raw.length - 1) + digit;
+    }
+    final dotIndex = current.indexOf('.');
+    if (dotIndex < 0) {
+      // Still on the integer part.
+      if (current.length >= maxIntegerDigits) return raw;
+    } else {
+      // On the fractional part — cap its length too (the integer cap alone let
+      // `0.000…` grow without bound).
+      if (current.length - dotIndex - 1 >= maxFractionDigits) return raw;
     }
     return '$raw$digit';
   }

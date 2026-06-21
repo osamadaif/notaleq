@@ -51,6 +51,14 @@ class _SheetDetailView extends StatelessWidget {
   /// Settled-line amount: the operand prefixed by its join (+ / − / × / ÷).
   /// Mirrors the editor's display.
   ({String amount, bool isNegative}) _amountDisplay(Line line, int dp) {
+    // An excluded (error) line shows what was typed — not its zeroed value —
+    // mirroring the editor.
+    if (line.isError == 1) {
+      return (
+        amount: _formatter.formatExpression(line.rawExpression),
+        isNegative: false,
+      );
+    }
     final value = Decimal.tryParse(line.computedValue) ?? Decimal.zero;
     final raw = line.rawExpression.trim();
     final first = raw.isEmpty ? '' : raw[0];
