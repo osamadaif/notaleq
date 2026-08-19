@@ -70,5 +70,13 @@
   "empty_draft_title": "Neues Blatt beginnen",
   "empty_draft_body": "Gib deine erste Zeile ein und die Summe erscheint automatisch",
   "empty_history_title": "Noch keine gespeicherten Blätter",
-  "empty_history_body": "Speichere ein Blatt aus dem Rechner, dann erscheint es hier"
+  "empty_history_body": "Speichere ein Blatt aus dem Rechner, dann erscheint es hier",
+  "export_requires_internet": "Für den Export ist eine Internetverbindung erforderlich. Prüfe deine Verbindung und versuche es erneut.",
+  "retry": "Erneut versuchen",
+  "export_ad_title": "Export freischalten",
+  "export_ad_body": "Sieh dir eine kurze Anzeige an, um den Export dieses Blatts freizuschalten.",
+  "watch_ad": "Anzeige ansehen",
+  "loading_ad": "Anzeige wird geladen…",
+  "ad_failed": "Die Anzeige konnte gerade nicht geladen werden. Versuche es erneut.",
+  "ad_dismissed": "Die Anzeige wurde nicht vollständig angesehen. Der Export bleibt daher gesperrt."
 }

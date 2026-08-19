@@ -70,5 +70,13 @@
   "empty_draft_title": "Commencez une nouvelle feuille",
   "empty_draft_body": "Saisissez votre première ligne et le total apparaît automatiquement",
   "empty_history_title": "Aucune feuille enregistrée",
-  "empty_history_body": "Enregistrez une feuille depuis la calculatrice pour la voir ici"
+  "empty_history_body": "Enregistrez une feuille depuis la calculatrice pour la voir ici",
+  "export_requires_internet": "L’exportation nécessite une connexion Internet. Vérifiez votre connexion et réessayez.",
+  "retry": "Réessayer",
+  "export_ad_title": "Déverrouiller l’exportation",
+  "export_ad_body": "Regardez une courte publicité pour déverrouiller l’exportation de cette feuille.",
+  "watch_ad": "Regarder la publicité",
+  "loading_ad": "Chargement de la publicité…",
+  "ad_failed": "La publicité n’a pas pu être chargée. Réessayez.",
+  "ad_dismissed": "La publicité n’a pas été regardée jusqu’au bout, l’exportation reste donc verrouillée."
 }

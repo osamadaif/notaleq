@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notaleq — Privacy Policy / سياسة الخصوصية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&amp;family=Manrope:wght@400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#0E7A6B;
+    --accent-soft:#0E7A6B14;
+    --ink:#1a2320;
+    --ink-soft:#4a5650;
+    --line:#e4e9e7;
+    --bg:#f7f9f8;
+    --card:#ffffff;
+    --ph:#fff3c4;
+    --ph-border:#e8c84d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope',system-ui,sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    padding:0 18px 80px;
+  }
+  body[dir="rtl"]{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif}
+
+  .topbar{
+    position:sticky;top:0;z-index:10;
+    background:rgba(247,249,248,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    margin:0 -18px 40px;padding:14px 18px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600}
+  .brand .dot{
+    width:28px;height:28px;border-radius:8px;
+    background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-weight:600;font-size:15px;
+    box-shadow:0 4px 12px var(--accent-soft);
+  }
+  .brand .name{font-size:16px;letter-spacing:.2px}
+  body[dir="rtl"] .brand .name{font-family:'IBM Plex Sans Arabic',sans-serif}
+
+  .toggle{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .toggle button{
+    border:0;background:transparent;cursor:pointer;
+    padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-soft);
+    font-family:inherit;transition:.18s;
+  }
+  .toggle button.active{background:var(--accent);color:#fff}
+
+  main{max-width:720px;margin:0 auto}
+  .accent-rule{height:3px;width:54px;background:var(--accent);border-radius:3px;margin-bottom:22px}
+  h1{
+    font-family:'Spectral',Georgia,serif;font-weight:600;
+    font-size:clamp(28px,6vw,40px);line-height:1.15;letter-spacing:-.01em;margin-bottom:8px;
+  }
+  body[dir="rtl"] h1{font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;letter-spacing:0}
+  .updated{color:var(--ink-soft);font-size:14px;margin-bottom:30px}
+  .lede{
+    font-size:18px;color:var(--ink-soft);
+    border-inline-start:3px solid var(--accent);
+    padding-inline-start:16px;margin-bottom:36px;
+  }
+  section{margin-bottom:30px}
+  h2{
+    font-family:'Spectral',Georgia,serif;font-weight:600;
+    font-size:20px;margin-bottom:8px;color:var(--ink);
+    display:flex;align-items:baseline;gap:10px;
+  }
+  body[dir="rtl"] h2{font-family:'IBM Plex Sans Arabic',sans-serif}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:600;font-family:'Manrope',sans-serif}
+  body[dir="rtl"] h2 .num{font-family:'IBM Plex Sans Arabic',sans-serif}
+  p{color:var(--ink-soft);font-size:16px}
+  p + p{margin-top:10px}
+  .ph{background:var(--ph);border:1px dashed var(--ph-border);border-radius:5px;padding:0 6px;color:#7a5c00;font-weight:600;font-size:.92em}
+
+  .lang-en{display:block}
+  .lang-ar{display:none}
+  body[dir="rtl"] .lang-en{display:none}
+  body[dir="rtl"] .lang-ar{display:block}
+
+  footer{max-width:720px;margin:50px auto 0;padding-top:24px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:14px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  @media (prefers-color-scheme:dark){
+    :root{
+      --accent:#21A78F;--accent-soft:#21A78F22;
+      --ink:#e8efec;--ink-soft:#9fb0aa;--line:#283330;
+      --bg:#10110f;--card:#1a1c1a;--ph:#3a3410;--ph-border:#7a6c1a;
+    }
+    .ph{color:#f0d77a}
+  }
+</style>
+</head>
+<body dir="ltr">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="dot">N</div>
+      <span class="name lang-en">Notaleq</span>
+      <span class="name lang-ar">نوتاليك</span>
+    </div>
+    <div class="toggle" role="group" aria-label="Language">
+      <button id="btn-en" class="active" onclick="setLang('en')">English</button>
+      <button id="btn-ar" onclick="setLang('ar')">العربية</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- ================= ENGLISH ================= -->
+    <div class="lang-en">
+      <div class="accent-rule"></div>
+      <h1>Privacy Policy</h1>
+      <div class="updated">Last updated: <span class="ph">19/08/2026</span></div>
+      <p class="lede">This Privacy Policy describes how Notaleq (&ldquo;the app&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) handles information. Notaleq is developed by <span class="ph">Osama Daif</span>. Your calculations remain on your device; the app also uses Google AdMob to provide advertising.</p>
+
+      <section>
+        <h2><span class="num">1</span> Information We Collect</h2>
+        <p>Notaleq does not require an account or ask for your name, email address, or phone number. We do not operate a server that receives your calculations.</p>
+        <p>All content you create in the app — including your calculations, line comments, saved sheets, and settings — is stored locally on your device only.</p>
+        <p>Google Mobile Ads may automatically collect and share ad-related information such as your IP address (which may indicate general location), interactions with the app and ads, diagnostic information, and device or account identifiers. Google uses this information for advertising, analytics, and fraud prevention.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">2</span> How Your Data Is Stored</h2>
+        <p>Your calculations, line comments, saved sheets, and settings are saved in local storage on your device (a local database and app settings). We do not upload this content to our servers or provide it to Google AdMob.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">3</span> Internet Access</h2>
+        <p>Notaleq uses the internet to request consent information and load Google AdMob banner and rewarded ads. Core calculation and local history features remain available without uploading your calculation content. Export requires an internet connection because it is unlocked through an optional rewarded ad.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">4</span> Data Sharing</h2>
+        <p>We do not sell your calculation content. The Google Mobile Ads SDK collects and shares the ad-related information described in section 1 with Google and advertising partners as needed to provide, measure, secure, and personalize or limit ads according to your consent choices.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">5</span> Third-Party Services</h2>
+        <p>Notaleq uses Google AdMob, including Google&rsquo;s User Messaging Platform for consent. You can learn how Google handles information in <a href="https://policies.google.com/privacy" rel="noopener noreferrer">Google&rsquo;s Privacy Policy</a> and review <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer">how Google uses information from apps that use its services</a>.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">6</span> Children&rsquo;s Privacy</h2>
+        <p>Notaleq is not directed at children under the age of 13, and we do not knowingly collect any personal information from children.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">7</span> Data Security and Your Control</h2>
+        <p>You remain in control of the content stored locally by Notaleq. You can delete saved calculations within the app at any time, and uninstalling the app removes its locally stored data. Where supported, advertising identifiers can also be reset or deleted through your device settings. Where required, the app asks for advertising consent before requesting ads.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">8</span> Permissions</h2>
+        <p>Notaleq uses internet access to load ads and may use your device&rsquo;s vibration feature for haptic feedback. On supported iOS versions, the app may ask for App Tracking Transparency permission after the consent flow; denying that permission does not block the calculator.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">9</span> Changes to This Privacy Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated &ldquo;Last updated&rdquo; date.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">10</span> Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, you can contact us at: <span class="ph">osama.daif.dev@gmail.com</span></p>
+      </section>
+    </div>
+
+    <!-- ================= ARABIC ================= -->
+    <div class="lang-ar">
+      <div class="accent-rule"></div>
+      <h1>سياسة الخصوصية</h1>
+      <div class="updated">آخر تحديث: <span class="ph">19/08/2026</span></div>
+      <p class="lede">توضّح سياسة الخصوصية هذه كيفية تعامل تطبيق نوتاليك (&laquo;التطبيق&raquo;، &laquo;نحن&raquo;) مع المعلومات. تم تطوير تطبيق نوتاليك بواسطة <span class="ph">اسامه ضيف</span>. تبقى عملياتك الحسابية على جهازك، ويستخدم التطبيق أيضًا Google AdMob لعرض الإعلانات.</p>
+
+      <section>
+        <h2><span class="num">١</span> المعلومات التي نجمعها</h2>
+        <p>لا يطلب تطبيق نوتاليك إنشاء حساب، ولا يطلب اسمك أو بريدك الإلكتروني أو رقم هاتفك. ولا ندير خادمًا يستقبل عملياتك الحسابية.</p>
+        <p>جميع المحتويات التي تنشئها داخل التطبيق — بما في ذلك العمليات الحسابية، والتعليقات على الأسطر، والصفحات المحفوظة، والإعدادات — تُخزَّن محليًا على جهازك فقط.</p>
+        <p>قد تجمع خدمة Google Mobile Ads وتشارك تلقائيًا معلومات مرتبطة بالإعلانات، مثل عنوان IP (الذي قد يشير إلى الموقع العام)، والتفاعل مع التطبيق والإعلانات، ومعلومات التشخيص، ومعرّفات الجهاز أو الحساب. تستخدم Google هذه المعلومات للإعلانات والتحليلات ومنع الاحتيال.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٢</span> كيفية تخزين بياناتك</h2>
+        <p>تُحفظ عملياتك الحسابية وتعليقات الأسطر والصفحات المحفوظة والإعدادات في وحدة التخزين المحلية على جهازك (قاعدة بيانات محلية وإعدادات التطبيق). لا نرفع هذا المحتوى إلى خوادمنا ولا نقدّمه إلى Google AdMob.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٣</span> الاتصال بالإنترنت</h2>
+        <p>يستخدم تطبيق نوتاليك الإنترنت لطلب معلومات الموافقة وتحميل إعلانات البانر والإعلانات بمكافأة من Google AdMob. تظل ميزات الحساب والسجل المحلي متاحة دون رفع محتوى عملياتك الحسابية. ويتطلب التصدير اتصالًا بالإنترنت لأنه يُفتح عبر إعلان اختياري بمكافأة.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٤</span> مشاركة البيانات</h2>
+        <p>نحن لا نبيع محتوى عملياتك الحسابية. تجمع حزمة Google Mobile Ads المعلومات المرتبطة بالإعلانات والموضحة في القسم ١ وتشاركها مع Google وشركاء الإعلانات عند الحاجة لعرض الإعلانات وقياسها وتأمينها وتخصيصها أو تقييدها وفق اختيارات الموافقة.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٥</span> خدمات الأطراف الثالثة</h2>
+        <p>يستخدم تطبيق نوتاليك Google AdMob، بما في ذلك منصة Google لإدارة موافقة المستخدم. يمكنك معرفة كيفية تعامل Google مع المعلومات في <a href="https://policies.google.com/privacy" rel="noopener noreferrer">سياسة خصوصية Google</a>، ومراجعة <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer">كيفية استخدام Google للمعلومات الواردة من التطبيقات التي تستخدم خدماتها</a>.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٦</span> خصوصية الأطفال</h2>
+        <p>تطبيق نوتاليك غير موجَّه للأطفال دون سن 13 عامًا، ونحن لا نجمع عن قصد أي معلومات شخصية من الأطفال.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٧</span> أمان البيانات وتحكّمك بها</h2>
+        <p>تحتفظ بالتحكم في المحتوى الذي يخزّنه تطبيق نوتاليك محليًا. يمكنك حذف العمليات الحسابية المحفوظة من داخل التطبيق في أي وقت، كما يؤدي إلغاء تثبيت التطبيق إلى إزالة بياناته المحلية. وعندما يدعم جهازك ذلك، يمكنك أيضًا إعادة تعيين معرّفات الإعلانات أو حذفها من إعداداته. وعند اشتراط ذلك، يطلب التطبيق موافقتك الإعلانية قبل طلب الإعلانات.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٨</span> الأذونات</h2>
+        <p>يستخدم تطبيق نوتاليك الاتصال بالإنترنت لتحميل الإعلانات، وقد يستخدم خاصية الاهتزاز لتوفير استجابة لمسية. وعلى إصدارات iOS المدعومة، قد يطلب التطبيق إذن شفافية تتبّع التطبيقات بعد مسار الموافقة؛ ولا يؤدي رفض هذا الإذن إلى حظر الحاسبة.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">٩</span> التغييرات على سياسة الخصوصية</h2>
+        <p>قد نقوم بتحديث سياسة الخصوصية هذه من وقت لآخر، وسيتم نشر أي تغييرات على هذه الصفحة مع تحديث تاريخ &laquo;آخر تحديث&raquo;.</p>
+      </section>
+
+      <section>
+        <h2><span class="num">١٠</span> التواصل معنا</h2>
+        <p>إذا كان لديك أي استفسارات بخصوص سياسة الخصوصية هذه، يمكنك التواصل معنا عبر: <span class="ph">osama.daif.dev@gmail.com</span></p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <span class="lang-en">&copy; <span id="yr-en"></span> Notaleq. All rights reserved.</span>
+    <span class="lang-ar">&copy; <span id="yr-ar"></span> نوتاليك. جميع الحقوق محفوظة.</span>
+  </footer>
+
+<script>
+  function setLang(l){
+    document.body.dir = (l === 'ar') ? 'rtl' : 'ltr';
+    document.documentElement.lang = l;
+    document.getElementById('btn-en').classList.toggle('active', l === 'en');
+    document.getElementById('btn-ar').classList.toggle('active', l === 'ar');
+  }
+  var y = new Date().getFullYear();
+  document.getElementById('yr-en').textContent = y;
+  document.getElementById('yr-ar').textContent = y;
+</script>
+</body>
+</html>

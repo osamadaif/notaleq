@@ -15,10 +15,13 @@ import 'package:notaleq/features/calculator/presentation/screens/calculator_scre
 import 'package:notaleq/features/calculator/presentation/widgets/numpad.dart';
 import 'package:notaleq/features/calculator/presentation/widgets/numpad_key.dart';
 import 'package:notaleq/features/calculator/presentation/widgets/total_bar.dart';
+import 'package:notaleq/features/export/presentation/cubit/export_gate_cubit.dart';
 import 'package:notaleq/features/settings/data/repos/settings_repository.dart';
 import 'package:notaleq/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:notaleq/features/settings/presentation/cubit/settings_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../export/export_gate_fakes.dart';
 
 void main() {
   late AppDatabase db;
@@ -31,6 +34,9 @@ void main() {
     await getIt.reset();
     getIt.registerFactory<CalculatorCubit>(
       () => CalculatorCubit(CalculatorRepository(db, prefs)),
+    );
+    getIt.registerFactory<ExportGateCubit>(
+      () => ExportGateCubit(FakeExportNetworkStatus(), FakeRewardedAdManager()),
     );
   });
 
@@ -157,8 +163,15 @@ void main() {
       ),
       findsOneWidget,
     );
-    Navigator.of(screenContext).pop();
+    await tester.tap(find.text('صورة'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('فتح التصدير'), findsOneWidget);
+    expect(find.text('شاهد الإعلان'), findsOneWidget);
+    await tester.tap(find.text('إلغاء'));
     await tester.pumpAndSettle();
+    expect(find.text('فتح التصدير'), findsNothing);
+    expect(find.byType(CalculatorScreen), findsOneWidget);
 
     await tester.tap(find.widgetWithText(NumpadKey, '='));
     await tester.pumpAndSettle();

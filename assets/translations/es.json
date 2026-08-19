@@ -70,5 +70,13 @@
   "empty_draft_title": "Empieza una hoja nueva",
   "empty_draft_body": "Escribe tu primera línea y el total aparecerá automáticamente",
   "empty_history_title": "Aún no hay hojas guardadas",
-  "empty_history_body": "Guarda una hoja desde la calculadora y aparecerá aquí"
+  "empty_history_body": "Guarda una hoja desde la calculadora y aparecerá aquí",
+  "export_requires_internet": "Para exportar se necesita conexión a Internet. Comprueba tu conexión e inténtalo de nuevo.",
+  "retry": "Reintentar",
+  "export_ad_title": "Desbloquear exportación",
+  "export_ad_body": "Mira un anuncio corto para desbloquear la exportación de esta hoja.",
+  "watch_ad": "Ver anuncio",
+  "loading_ad": "Cargando anuncio…",
+  "ad_failed": "No se pudo cargar el anuncio. Inténtalo de nuevo.",
+  "ad_dismissed": "El anuncio no se completó, por lo que la exportación sigue bloqueada."
 }

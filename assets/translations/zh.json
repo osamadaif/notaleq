@@ -70,5 +70,13 @@
   "empty_draft_title": "开始新表格",
   "empty_draft_body": "输入第一行，总计会自动显示",
   "empty_history_title": "暂无已保存的表格",
-  "empty_history_body": "从计算器保存表格后会显示在这里"
+  "empty_history_body": "从计算器保存表格后会显示在这里",
+  "export_requires_internet": "导出需要互联网连接。请检查网络后重试。",
+  "retry": "重试",
+  "export_ad_title": "解锁导出",
+  "export_ad_body": "观看一则短广告即可解锁此表单的导出功能。",
+  "watch_ad": "观看广告",
+  "loading_ad": "正在加载广告…",
+  "ad_failed": "暂时无法加载广告，请重试。",
+  "ad_dismissed": "广告未播放完成，因此导出仍处于锁定状态。"
 }

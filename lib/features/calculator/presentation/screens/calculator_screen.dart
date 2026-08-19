@@ -21,6 +21,8 @@ import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../../../settings/presentation/cubit/settings_state.dart';
 import '../../../export/data/sheet_export_service.dart';
 import '../../../export/domain/sheet_export_document.dart';
+import '../../../export/presentation/cubit/export_gate_cubit.dart';
+import '../../../export/presentation/export_gate_ui.dart';
 import '../../../export/presentation/sheet_export_ui.dart';
 import '../../domain/entities/ledger_line.dart';
 import '../cubit/calculator_cubit.dart';
@@ -38,8 +40,11 @@ class CalculatorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<CalculatorCubit>()..load(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<CalculatorCubit>()..load()),
+        BlocProvider(create: (_) => getIt<ExportGateCubit>()),
+      ],
       child: const _CalculatorView(),
     );
   }
@@ -127,6 +132,11 @@ class _CalculatorViewState extends State<_CalculatorView> {
     if (format == null || !context.mounted) return;
     setState(() => _isExporting = true);
     try {
+      final unlocked = await requestRewardedExport(
+        context,
+        context.read<ExportGateCubit>(),
+      );
+      if (!unlocked || !context.mounted) return;
       await _shareDocument(context, state, settings, format);
     } on SheetExportException {
       if (context.mounted) _showExportMessage(context, LangKeys.exportFailed);

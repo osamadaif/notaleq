@@ -1,8 +1,7 @@
 /// Failure hierarchy used across the data/domain boundary.
 ///
-/// Notaleq is **local-only** — there is no network layer — so there are no
-/// `ServerFailure` / `DioException` style failures. Everything that can go wrong
-/// is either a local database problem or a validation problem.
+/// Calculation data stays local, while the ads layer can also report network
+/// and ad-serving failures.
 ///
 /// Repositories return `Either<Failures, T>` (fpdart); the left side is always
 /// one of these.
@@ -30,6 +29,21 @@ class ValidationFailure extends Failures {
 /// A requested record was not found (e.g. loading a deleted sheet).
 class NotFoundFailure extends Failures {
   const NotFoundFailure(super.message);
+}
+
+/// No network interface is currently available for an ad-backed export.
+class NetworkFailure extends Failures {
+  const NetworkFailure(super.message);
+}
+
+/// A rewarded ad could not be loaded or shown.
+class AdLoadFailure extends Failures {
+  const AdLoadFailure(super.message);
+}
+
+/// The rewarded ad closed before the reward callback was received.
+class AdDismissedFailure extends Failures {
+  const AdDismissedFailure(super.message);
 }
 
 /// Anything genuinely unexpected — keep rare; prefer a specific failure.

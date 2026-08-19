@@ -95,6 +95,9 @@ treat that file as the source of truth and keep code consistent with it.
   does not reset the running tape.
 - **Export:** the calculator top bar has one Share action that opens an
   Image/PDF picker. Saved-sheet detail shows separate Image and PDF actions.
+  After format selection, an explicit Watch-ad/Cancel dialog gates each export
+  attempt. A rewarded-ad completion opens the native share sheet directly;
+  there is no preview screen and no persisted unlock.
   The shared A4 document includes the sheet name/date, numbered operation table,
   comments and section headers, excluded errors, subtotals, currency, final
   total, and page numbering. Long PDFs paginate automatically; Image export
@@ -143,7 +146,7 @@ Settings + `active_calculation_id` live in `shared_preferences`.
 
 ## Out of scope for v1
 
-Soulver-style line references; currency conversion; cloud sync; PDF/image export.
+Soulver-style line references; currency conversion; cloud sync.
 Note them as future work; don't build them yet.
 
 ---

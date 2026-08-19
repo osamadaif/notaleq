@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 import '../../../../core/database/app_database.dart';
+import '../../../../core/ads/ad_ids.dart';
+import '../../../../core/ads/widgets/banner_ad_slot.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/format/amount_formatter.dart';
 import '../../../../core/language/app_localizations.dart';
@@ -94,6 +96,11 @@ class _HistoryViewState extends State<_HistoryView> {
               onChanged: (q) => context.read<HistoryCubit>().search(q),
             ),
           ),
+          if (AdIds.canServeAds)
+            BannerAdSlot(
+              adUnitId: AdIds.historyBanner,
+              variant: BannerAdVariant.adaptive,
+            ),
           Expanded(
             child: BlocBuilder<HistoryCubit, HistoryState>(
               builder: (context, state) {

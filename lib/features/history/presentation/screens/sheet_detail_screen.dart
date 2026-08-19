@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 import '../../../../core/database/app_database.dart';
+import '../../../../core/ads/ad_ids.dart';
+import '../../../../core/ads/widgets/banner_ad_slot.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/format/amount_formatter.dart';
 import '../../../../core/format/currencies.dart';
@@ -22,6 +24,8 @@ import '../../../calculator/presentation/widgets/total_bar.dart';
 import '../../../export/data/sheet_export_service.dart';
 import '../../../export/domain/sheet_export_document.dart';
 import '../../../export/presentation/sheet_export_ui.dart';
+import '../../../export/presentation/cubit/export_gate_cubit.dart';
+import '../../../export/presentation/export_gate_ui.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../../../settings/presentation/cubit/settings_state.dart';
 import '../cubit/sheet_detail_cubit.dart';
@@ -37,8 +41,13 @@ class SheetDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<SheetDetailCubit>()..load(calculationId),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => getIt<SheetDetailCubit>()..load(calculationId),
+        ),
+        BlocProvider(create: (_) => getIt<ExportGateCubit>()),
+      ],
       child: const _SheetDetailView(),
     );
   }
@@ -82,6 +91,11 @@ class _SheetDetailViewState extends State<_SheetDetailView> {
     if (sheet == null || _isExporting) return;
     setState(() => _isExporting = true);
     try {
+      final unlocked = await requestRewardedExport(
+        context,
+        context.read<ExportGateCubit>(),
+      );
+      if (!unlocked || !context.mounted) return;
       final document = _exportDocument(context, state, sheet, settings);
       await getIt<SheetExportService>().share(
         document,
@@ -185,12 +199,23 @@ class _SheetDetailViewState extends State<_SheetDetailView> {
           ),
           body: SafeArea(
             top: false,
-            child: _body(
-              context,
-              state,
-              sheet,
-              dp,
-              _currencySymbol(context, settings.currencyCode),
+            child: Column(
+              children: [
+                if (AdIds.canServeAds)
+                  BannerAdSlot(
+                    adUnitId: AdIds.sheetDetailBanner,
+                    variant: BannerAdVariant.adaptive,
+                  ),
+                Expanded(
+                  child: _body(
+                    context,
+                    state,
+                    sheet,
+                    dp,
+                    _currencySymbol(context, settings.currencyCode),
+                  ),
+                ),
+              ],
             ),
           ),
         );

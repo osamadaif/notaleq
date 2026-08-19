@@ -1,7 +1,8 @@
 # Notaleq — Project Guide (CLAUDE.md)
 
-Notaleq is a **multi-line ledger calculator** (Flutter, Android + iOS, **local-only**,
-no backend/network). Each *line* is an independent calculator expression that
+Notaleq is a **multi-line ledger calculator** (Flutter, Android + iOS). User
+calculations stay local and there is no backend, but Google AdMob uses the
+network for banner ads, consent, and rewarded export ads. Each *line* is an independent calculator expression that
 evaluates to one signed number; the app keeps a **live running total** of all line
 results, and every line can carry an optional Arabic comment. Sheets are saved by
 name into a searchable history, or kept as an auto-persisted draft.
@@ -32,15 +33,17 @@ Four features:
 
 - `app/` — root `NotaleqApp` widget (`MaterialApp`, themes, locale, i18n wiring,
   `onGenerateRoute: AppRouter.onGenerateRoute`).
+- `ads/` — AdMob IDs, UMP consent, SDK startup, rewarded-ad lifecycle, and the
+  reusable banner slot. Debug builds select Google's test ad unit IDs.
 - `di/injection_container.dart` — single `setUpInjector()` that registers every
   service/repo/cubit in `GetIt`, grouped into `_initX()` helpers (one per
   feature). Awaited in `main()` before `runApp()`.
 - `database/` — the drift SQLite DB: the two tables from `SCHEMA.md`
   (`calculations`, `lines`) + DAOs. Generated `*.g.dart` lives here. **The drift
   classes are the persistence data models** — don't hand-write them.
-- `errors/failures.dart` — `Failures` (sealed) + `DatabaseFailure`,
-  `ValidationFailure`, `NotFoundFailure`, `UnexpectedFailure`. No
-  `ServerFailure`/network failures — the app is local-only.
+- `errors/failures.dart` — `Failures` (sealed) + local persistence/validation
+  failures and `NetworkFailure`, `AdLoadFailure`, `AdDismissedFailure` for the
+  export gate.
 - `extensions/` — Dart/Flutter extensions (string null/blank, context helpers;
   add decimal helpers when money logic lands).
 - `language/` — **manual i18n**: `assets/translations/{ar,en}.json` +
@@ -137,8 +140,11 @@ Use the **`decimal`** package. Amounts are stored/computed as **decimal strings*
 - `=` inserts a persisted, non-editable subtotal marker plus a fresh continuation
   row. Subtotals recompute from the expression rows above them, do not reset the
   running tape, survive draft reloads, and appear in saved-sheet detail views.
-- The calculator top bar shares the current sheet through an Image/PDF picker.
-  Saved-sheet detail exposes both actions directly. PDF output is paginated A4;
+- The calculator top bar starts with an Image/PDF picker. Saved-sheet detail
+  exposes both formats directly. Each choice then shows an explicit
+  Watch-ad/Cancel dialog; only `onUserEarnedReward` unlocks that one attempt.
+  A successful reward exports to the native share sheet directly, with no
+  preview screen. PDF output is paginated A4;
   Image output is one PNG for a one-page sheet or multiple PNG pages for a long
   sheet. Both formats include comments, section rows, errors, subtotals, and the
   final total. Export rendering always uses the light design palette regardless
@@ -178,12 +184,13 @@ Runtime: `flutter_bloc` (Cubit) · `get_it` (DI) · `drift` + `sqlite3_flutter_l
 `freezed_annotation` (state annotations) · `flutter_localizations` (SDK; Arabic
 RTL Material localization) · `flutter_svg` (renders the exact design icon set) ·
 `pdf` (A4 document generation) · `printing` (PDF page rasterization) ·
-`share_plus` (native file share sheet).
+`share_plus` (native file share sheet) · `google_mobile_ads` (AdMob + UMP) ·
+`connectivity_plus` (fast network-interface pre-check before rewarded export).
 
 Dev: `build_runner` · `drift_dev` · `freezed` · `flutter_lints`.
 
-Deliberately **not** added: `json_serializable`/`json_annotation` (local-only, no
-JSON DTOs — drift handles DB serialization). The click-sound package
+Deliberately **not** added: `json_serializable`/`json_annotation` (calculation
+data has no remote JSON DTOs — drift handles DB serialization). The click-sound package
 (`soundpool`/`flutter_soloud`) is deferred to the feedback layer; haptics use the
 built-in `HapticFeedback`.
 
@@ -205,6 +212,7 @@ built-in `HapticFeedback`.
 ```
 lib/
   core/
+    ads/         IDs · consent · SDK lifecycle · rewarded manager · banner slot
     app/         app.dart
     di/          injection_container.dart
     database/    app_database.dart (+ app_database.g.dart) — drift DB + DAOs
@@ -222,9 +230,9 @@ lib/
   features/
     calculator/  data/repos · domain/{entities,parser,expression_input,ledger_totals}
                  presentation/{cubit,screens,widgets}        # ← implemented
-    export/      data/{sheet_export_pdf_builder,sheet_export_service}
-                 domain/sheet_export_document
-                 presentation/sheet_export_ui                # ← implemented
+    export/      export builders/service + network pre-check
+                 domain export models
+                 presentation format picker + ExportGateCubit # ← implemented
     history/     data/repos · presentation/{cubit,screens,widgets}  # ← implemented
     settings/    data/repos · presentation/{cubit,screens,widgets}  # ← implemented
   main.dart

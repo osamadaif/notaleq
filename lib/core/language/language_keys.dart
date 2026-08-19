@@ -38,6 +38,14 @@ class LangKeys {
   static const String createdWith = 'created_with';
   static const String exportFailed = 'export_failed';
   static const String nothingToExport = 'nothing_to_export';
+  static const String exportRequiresInternet = 'export_requires_internet';
+  static const String retry = 'retry';
+  static const String exportAdTitle = 'export_ad_title';
+  static const String exportAdBody = 'export_ad_body';
+  static const String watchAd = 'watch_ad';
+  static const String loadingAd = 'loading_ad';
+  static const String adFailed = 'ad_failed';
+  static const String adDismissed = 'ad_dismissed';
 
   // Save sheet
   static const String saveSheet = 'save_sheet';

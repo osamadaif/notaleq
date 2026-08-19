@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/format/currencies.dart';
+import '../../../../core/ads/ad_ids.dart';
+import '../../../../core/ads/widgets/banner_ad_slot.dart';
 import '../../../../core/language/app_localizations.dart';
 import '../../../../core/language/language_keys.dart';
 import '../../../../core/style/app_colors.dart';
@@ -302,6 +304,11 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              if (AdIds.canServeAds)
+                BannerAdSlot(
+                  adUnitId: AdIds.settingsBanner,
+                  variant: BannerAdVariant.mediumRectangle,
+                ),
             ],
           );
         },

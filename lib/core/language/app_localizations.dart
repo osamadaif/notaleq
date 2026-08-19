@@ -17,6 +17,7 @@ class AppLocalizations {
   final Locale locale;
 
   Map<String, String> _strings = const {};
+  Map<String, String> _fallbackStrings = const {};
 
   /// Arabic (primary) + English and the most-used world languages.
   static const List<Locale> supportedLocales = [
@@ -42,18 +43,24 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   Future<void> load() async {
+    _strings = await _loadStrings(locale.languageCode);
+    if (locale.languageCode != 'en') {
+      _fallbackStrings = await _loadStrings('en');
+    }
+  }
+
+  Future<Map<String, String>> _loadStrings(String languageCode) async {
     final raw = await rootBundle.loadString(
-      AppAssets.translations(locale.languageCode),
+      AppAssets.translations(languageCode),
     );
-    final Map<String, dynamic> decoded =
-        json.decode(raw) as Map<String, dynamic>;
-    _strings = decoded.map((k, v) => MapEntry(k, v.toString()));
+    final decoded = json.decode(raw) as Map<String, dynamic>;
+    return decoded.map((key, value) => MapEntry(key, value.toString()));
   }
 
   /// Returns the translation for [key], interpolating `{name}` placeholders from
   /// [params]. Falls back to the key itself if missing (and warns in debug).
   String tr(String key, {Map<String, String>? params}) {
-    var value = _strings[key];
+    var value = _strings[key] ?? _fallbackStrings[key];
     if (value == null) {
       if (kDebugMode) {
         debugPrint('Missing translation: $key (${locale.languageCode})');
