@@ -325,7 +325,8 @@ class _CalculatorViewState extends State<_CalculatorView> {
                     title: state.isDraft
                         ? context.tr(LangKeys.draft)
                         : state.sheetName!,
-                    themeIcon: darkTheme ? AppIcons.sun : AppIcons.moon,
+                    // themeIcon: darkTheme ? AppIcons.sun : AppIcons.moon,
+                    themeIcon:AppIcons.sun,
                     themeTooltip: context.tr(
                       darkTheme ? LangKeys.themeLight : LangKeys.themeDark,
                     ),
