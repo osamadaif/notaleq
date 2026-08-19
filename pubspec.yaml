@@ -53,6 +53,11 @@ dependencies:
   flutter_svg: ^2.3.0
   flutter_screenutil: ^5.9.3
   package_info_plus: ^9.0.1
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  share_plus: ^11.1.0
+  google_mobile_ads: ^7.0.0
+  connectivity_plus: ^7.3.1
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +92,7 @@ flutter:
     # Exact icon set from the Claude Design handoff (1.8px stroke, 24px grid),
     # rendered with flutter_svg and tinted via colorFilter.
     - assets/icons/
+    - app-icon-exports/mark-1024-transparent.png
 
   # Design-system fonts (extracted from the Claude Design handoff):
   #   IBM Plex Sans Arabic  → all Arabic comments / labels / UI text

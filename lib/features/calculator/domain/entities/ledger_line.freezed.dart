@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LedgerLine {
 
- String get rawExpression; String? get comment; LedgerJoin get join; Decimal get computedValue; bool get isError; ExpressionErrorKind? get errorKind;
+ LedgerLineKind get kind; String get rawExpression; String? get comment; LedgerJoin get join; Decimal get computedValue; bool get isError; ExpressionErrorKind? get errorKind;
 /// Create a copy of LedgerLine
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $LedgerLineCopyWith<LedgerLine> get copyWith => _$LedgerLineCopyWithImpl<LedgerL
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LedgerLine&&(identical(other.rawExpression, rawExpression) || other.rawExpression == rawExpression)&&(identical(other.comment, comment) || other.comment == comment)&&(identical(other.join, join) || other.join == join)&&(identical(other.computedValue, computedValue) || other.computedValue == computedValue)&&(identical(other.isError, isError) || other.isError == isError)&&(identical(other.errorKind, errorKind) || other.errorKind == errorKind));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LedgerLine&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.rawExpression, rawExpression) || other.rawExpression == rawExpression)&&(identical(other.comment, comment) || other.comment == comment)&&(identical(other.join, join) || other.join == join)&&(identical(other.computedValue, computedValue) || other.computedValue == computedValue)&&(identical(other.isError, isError) || other.isError == isError)&&(identical(other.errorKind, errorKind) || other.errorKind == errorKind));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,rawExpression,comment,join,computedValue,isError,errorKind);
+int get hashCode => Object.hash(runtimeType,kind,rawExpression,comment,join,computedValue,isError,errorKind);
 
 @override
 String toString() {
-  return 'LedgerLine(rawExpression: $rawExpression, comment: $comment, join: $join, computedValue: $computedValue, isError: $isError, errorKind: $errorKind)';
+  return 'LedgerLine(kind: $kind, rawExpression: $rawExpression, comment: $comment, join: $join, computedValue: $computedValue, isError: $isError, errorKind: $errorKind)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $LedgerLineCopyWith<$Res>  {
   factory $LedgerLineCopyWith(LedgerLine value, $Res Function(LedgerLine) _then) = _$LedgerLineCopyWithImpl;
 @useResult
 $Res call({
- String rawExpression, String? comment, LedgerJoin join, Decimal computedValue, bool isError, ExpressionErrorKind? errorKind
+ LedgerLineKind kind, String rawExpression, String? comment, LedgerJoin join, Decimal computedValue, bool isError, ExpressionErrorKind? errorKind
 });
 
 
@@ -62,9 +62,10 @@ class _$LedgerLineCopyWithImpl<$Res>
 
 /// Create a copy of LedgerLine
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? rawExpression = null,Object? comment = freezed,Object? join = null,Object? computedValue = null,Object? isError = null,Object? errorKind = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? kind = null,Object? rawExpression = null,Object? comment = freezed,Object? join = null,Object? computedValue = null,Object? isError = null,Object? errorKind = freezed,}) {
   return _then(_self.copyWith(
-rawExpression: null == rawExpression ? _self.rawExpression : rawExpression // ignore: cast_nullable_to_non_nullable
+kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as LedgerLineKind,rawExpression: null == rawExpression ? _self.rawExpression : rawExpression // ignore: cast_nullable_to_non_nullable
 as String,comment: freezed == comment ? _self.comment : comment // ignore: cast_nullable_to_non_nullable
 as String?,join: null == join ? _self.join : join // ignore: cast_nullable_to_non_nullable
 as LedgerJoin,computedValue: null == computedValue ? _self.computedValue : computedValue // ignore: cast_nullable_to_non_nullable
@@ -152,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String rawExpression,  String? comment,  LedgerJoin join,  Decimal computedValue,  bool isError,  ExpressionErrorKind? errorKind)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LedgerLineKind kind,  String rawExpression,  String? comment,  LedgerJoin join,  Decimal computedValue,  bool isError,  ExpressionErrorKind? errorKind)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LedgerLine() when $default != null:
-return $default(_that.rawExpression,_that.comment,_that.join,_that.computedValue,_that.isError,_that.errorKind);case _:
+return $default(_that.kind,_that.rawExpression,_that.comment,_that.join,_that.computedValue,_that.isError,_that.errorKind);case _:
   return orElse();
 
 }
@@ -173,10 +174,10 @@ return $default(_that.rawExpression,_that.comment,_that.join,_that.computedValue
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String rawExpression,  String? comment,  LedgerJoin join,  Decimal computedValue,  bool isError,  ExpressionErrorKind? errorKind)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LedgerLineKind kind,  String rawExpression,  String? comment,  LedgerJoin join,  Decimal computedValue,  bool isError,  ExpressionErrorKind? errorKind)  $default,) {final _that = this;
 switch (_that) {
 case _LedgerLine():
-return $default(_that.rawExpression,_that.comment,_that.join,_that.computedValue,_that.isError,_that.errorKind);}
+return $default(_that.kind,_that.rawExpression,_that.comment,_that.join,_that.computedValue,_that.isError,_that.errorKind);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -190,10 +191,10 @@ return $default(_that.rawExpression,_that.comment,_that.join,_that.computedValue
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String rawExpression,  String? comment,  LedgerJoin join,  Decimal computedValue,  bool isError,  ExpressionErrorKind? errorKind)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LedgerLineKind kind,  String rawExpression,  String? comment,  LedgerJoin join,  Decimal computedValue,  bool isError,  ExpressionErrorKind? errorKind)?  $default,) {final _that = this;
 switch (_that) {
 case _LedgerLine() when $default != null:
-return $default(_that.rawExpression,_that.comment,_that.join,_that.computedValue,_that.isError,_that.errorKind);case _:
+return $default(_that.kind,_that.rawExpression,_that.comment,_that.join,_that.computedValue,_that.isError,_that.errorKind);case _:
   return null;
 
 }
@@ -205,9 +206,10 @@ return $default(_that.rawExpression,_that.comment,_that.join,_that.computedValue
 
 
 class _LedgerLine extends LedgerLine {
-  const _LedgerLine({this.rawExpression = '', this.comment, this.join = LedgerJoin.add, required this.computedValue, this.isError = false, this.errorKind}): super._();
+  const _LedgerLine({this.kind = LedgerLineKind.expression, this.rawExpression = '', this.comment, this.join = LedgerJoin.add, required this.computedValue, this.isError = false, this.errorKind}): super._();
   
 
+@override@JsonKey() final  LedgerLineKind kind;
 @override@JsonKey() final  String rawExpression;
 @override final  String? comment;
 @override@JsonKey() final  LedgerJoin join;
@@ -225,16 +227,16 @@ _$LedgerLineCopyWith<_LedgerLine> get copyWith => __$LedgerLineCopyWithImpl<_Led
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LedgerLine&&(identical(other.rawExpression, rawExpression) || other.rawExpression == rawExpression)&&(identical(other.comment, comment) || other.comment == comment)&&(identical(other.join, join) || other.join == join)&&(identical(other.computedValue, computedValue) || other.computedValue == computedValue)&&(identical(other.isError, isError) || other.isError == isError)&&(identical(other.errorKind, errorKind) || other.errorKind == errorKind));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LedgerLine&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.rawExpression, rawExpression) || other.rawExpression == rawExpression)&&(identical(other.comment, comment) || other.comment == comment)&&(identical(other.join, join) || other.join == join)&&(identical(other.computedValue, computedValue) || other.computedValue == computedValue)&&(identical(other.isError, isError) || other.isError == isError)&&(identical(other.errorKind, errorKind) || other.errorKind == errorKind));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,rawExpression,comment,join,computedValue,isError,errorKind);
+int get hashCode => Object.hash(runtimeType,kind,rawExpression,comment,join,computedValue,isError,errorKind);
 
 @override
 String toString() {
-  return 'LedgerLine(rawExpression: $rawExpression, comment: $comment, join: $join, computedValue: $computedValue, isError: $isError, errorKind: $errorKind)';
+  return 'LedgerLine(kind: $kind, rawExpression: $rawExpression, comment: $comment, join: $join, computedValue: $computedValue, isError: $isError, errorKind: $errorKind)';
 }
 
 
@@ -245,7 +247,7 @@ abstract mixin class _$LedgerLineCopyWith<$Res> implements $LedgerLineCopyWith<$
   factory _$LedgerLineCopyWith(_LedgerLine value, $Res Function(_LedgerLine) _then) = __$LedgerLineCopyWithImpl;
 @override @useResult
 $Res call({
- String rawExpression, String? comment, LedgerJoin join, Decimal computedValue, bool isError, ExpressionErrorKind? errorKind
+ LedgerLineKind kind, String rawExpression, String? comment, LedgerJoin join, Decimal computedValue, bool isError, ExpressionErrorKind? errorKind
 });
 
 
@@ -262,9 +264,10 @@ class __$LedgerLineCopyWithImpl<$Res>
 
 /// Create a copy of LedgerLine
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? rawExpression = null,Object? comment = freezed,Object? join = null,Object? computedValue = null,Object? isError = null,Object? errorKind = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? kind = null,Object? rawExpression = null,Object? comment = freezed,Object? join = null,Object? computedValue = null,Object? isError = null,Object? errorKind = freezed,}) {
   return _then(_LedgerLine(
-rawExpression: null == rawExpression ? _self.rawExpression : rawExpression // ignore: cast_nullable_to_non_nullable
+kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as LedgerLineKind,rawExpression: null == rawExpression ? _self.rawExpression : rawExpression // ignore: cast_nullable_to_non_nullable
 as String,comment: freezed == comment ? _self.comment : comment // ignore: cast_nullable_to_non_nullable
 as String?,join: null == join ? _self.join : join // ignore: cast_nullable_to_non_nullable
 as LedgerJoin,computedValue: null == computedValue ? _self.computedValue : computedValue // ignore: cast_nullable_to_non_nullable

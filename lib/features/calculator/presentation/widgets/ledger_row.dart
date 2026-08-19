@@ -28,19 +28,16 @@ class LedgerRow extends StatelessWidget {
        _headerTitle = null;
 
   /// A comment-only section header (contributes 0, excluded from the total).
-  const LedgerRow.sectionHeader({
-    super.key,
-    required String title,
-    this.onTap,
-  })  : _isSectionHeader = true,
-        _headerTitle = title,
-        amountText = null,
-        comment = null,
-        isNegative = false,
-        isActive = false,
-        isError = false,
-        excludedLabel = null,
-        noCommentLabel = '—';
+  const LedgerRow.sectionHeader({super.key, required String title, this.onTap})
+    : _isSectionHeader = true,
+      _headerTitle = title,
+      amountText = null,
+      comment = null,
+      isNegative = false,
+      isActive = false,
+      isError = false,
+      excludedLabel = null,
+      noCommentLabel = '—';
 
   /// Display-formatted amount (null only for a section header).
   final String? amountText;
@@ -120,8 +117,10 @@ class LedgerRow extends StatelessWidget {
     if (!hasComment) {
       return Text(
         noCommentLabel,
-        style: AppTextStyles.comment
-            .copyWith(fontSize: 15.sp, color: c.textMuted),
+        style: AppTextStyles.comment.copyWith(
+          fontSize: 15.sp,
+          color: c.textMuted,
+        ),
       );
     }
     return Text(
@@ -151,10 +150,12 @@ class LedgerRow extends StatelessWidget {
       );
     }
 
-    final Color amountColor =
-        isActive ? c.accentStrong : (isNegative ? c.negative : c.textPrimary);
-    final TextStyle style =
-        isActive ? AppTextStyles.amountActiveRow : AppTextStyles.amountSettled;
+    final Color amountColor = isActive
+        ? c.accentStrong
+        : (isNegative ? c.negative : c.textPrimary);
+    final TextStyle style = isActive
+        ? AppTextStyles.amountActiveRow
+        : AppTextStyles.amountSettled;
 
     return Text(
       amountText ?? '',

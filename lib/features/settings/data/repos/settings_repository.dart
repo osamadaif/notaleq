@@ -32,14 +32,12 @@ class SettingsRepository {
   String get themeMode => _prefs.getString(_themeKey) ?? AppThemeMode.system;
   String? get languageCode => _prefs.getString(_languageKey);
 
-  Future<void> setSoundEnabled(bool value) =>
-      _prefs.setBool(_soundKey, value);
+  Future<void> setSoundEnabled(bool value) => _prefs.setBool(_soundKey, value);
   Future<void> setHapticEnabled(bool value) =>
       _prefs.setBool(_hapticKey, value);
   Future<void> setDecimalPlaces(int value) =>
       _prefs.setInt(_decimalsKey, value);
-  Future<void> setThemeMode(String value) =>
-      _prefs.setString(_themeKey, value);
+  Future<void> setThemeMode(String value) => _prefs.setString(_themeKey, value);
 
   Future<void> setCurrencyCode(String? value) => value == null
       ? _prefs.remove(_currencyKey)

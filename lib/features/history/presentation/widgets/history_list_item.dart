@@ -58,14 +58,15 @@ class HistoryListItem extends StatelessWidget {
                       name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style:
-                          AppTextStyles.title.copyWith(color: c.textPrimary),
+                      style: AppTextStyles.title.copyWith(color: c.textPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       dateText,
-                      style: AppTextStyles.meta
-                          .copyWith(fontSize: 12.sp, color: c.textMuted),
+                      style: AppTextStyles.meta.copyWith(
+                        fontSize: 12.sp,
+                        color: c.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -83,7 +84,11 @@ class HistoryListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadii.chip),
                   child: Padding(
                     padding: EdgeInsets.all(AppSpacing.xs),
-                    child: AppSvgIcon(AppIcons.delete, size: 19.r, color: c.textMuted),
+                    child: AppSvgIcon(
+                      AppIcons.delete,
+                      size: 19.r,
+                      color: c.textMuted,
+                    ),
                   ),
                 ),
               ],

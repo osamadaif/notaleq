@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 
 import 'app_colors.dart';
 import 'app_dimens.dart';
@@ -13,17 +14,30 @@ class AppTheme {
   static ThemeData get light => _build(Brightness.light, AppColors.light);
   static ThemeData get dark => _build(Brightness.dark, AppColors.dark);
 
+  static SystemUiOverlayStyle systemUiOverlayStyle(Brightness brightness) {
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: brightness,
+      statusBarIconBrightness: brightness == Brightness.dark
+          ? Brightness.light
+          : Brightness.dark,
+      systemStatusBarContrastEnforced: false,
+    );
+  }
+
   static ThemeData _build(Brightness brightness, AppColors c) {
     final colorScheme =
-        ColorScheme.fromSeed(seedColor: c.accent, brightness: brightness)
-            .copyWith(
-              primary: c.accent,
-              onPrimary: c.onAccent,
-              surface: c.surface,
-              onSurface: c.textPrimary,
-              error: c.error,
-              outline: c.hairline,
-            );
+        ColorScheme.fromSeed(
+          seedColor: c.accent,
+          brightness: brightness,
+        ).copyWith(
+          primary: c.accent,
+          onPrimary: c.onAccent,
+          surface: c.surface,
+          onSurface: c.textPrimary,
+          error: c.error,
+          outline: c.hairline,
+        );
 
     final base = ThemeData(
       useMaterial3: true,
@@ -38,11 +52,7 @@ class AppTheme {
     return base.copyWith(
       textTheme: _textTheme(base.textTheme, c),
       dividerColor: c.hairline,
-      dividerTheme: DividerThemeData(
-        color: c.hairline,
-        thickness: 1,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: c.hairline, thickness: 1, space: 1),
       iconTheme: IconThemeData(color: c.textSecondary, size: AppSizes.iconGrid),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: c.surface,
@@ -70,10 +80,7 @@ class AppTheme {
           bodySmall: AppTextStyles.helper,
           labelLarge: AppTextStyles.button,
         )
-        .apply(
-          bodyColor: c.textPrimary,
-          displayColor: c.textPrimary,
-        );
+        .apply(bodyColor: c.textPrimary, displayColor: c.textPrimary);
   }
 }
 

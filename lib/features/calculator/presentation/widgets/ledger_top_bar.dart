@@ -12,22 +12,34 @@ class LedgerTopBar extends StatelessWidget {
   const LedgerTopBar({
     super.key,
     required this.title,
+    required this.themeIcon,
+    required this.themeTooltip,
+    required this.shareTooltip,
     this.meta,
     this.onTitleTap,
     this.onHistory,
+    this.onShare,
     this.onSave,
+    this.onThemeToggle,
     this.onSettings,
+    this.isSharing = false,
   });
 
   final String title;
+  final String themeIcon;
+  final String themeTooltip;
+  final String shareTooltip;
 
   /// e.g. "8 lines · 1,750".
   final String? meta;
 
   final VoidCallback? onTitleTap;
   final VoidCallback? onHistory;
+  final VoidCallback? onShare;
   final VoidCallback? onSave;
+  final VoidCallback? onThemeToggle;
   final VoidCallback? onSettings;
+  final bool isSharing;
 
   @override
   Widget build(BuildContext context) {
@@ -62,29 +74,59 @@ class LedgerTopBar extends StatelessWidget {
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style:
-                              AppTextStyles.title.copyWith(color: c.textPrimary),
+                          style: AppTextStyles.title.copyWith(
+                            color: c.textPrimary,
+                          ),
                         ),
                         if (meta != null)
                           Text(
                             meta!,
-                            style:
-                                AppTextStyles.meta.copyWith(color: c.textMuted),
+                            style: AppTextStyles.meta.copyWith(
+                              color: c.textMuted,
+                            ),
                           ),
                       ],
                     ),
                   ),
                   if (onTitleTap != null)
-                    AppSvgIcon(AppIcons.chevronDown,
-                        size: 16.r, color: c.textMuted),
+                    AppSvgIcon(
+                      AppIcons.chevronDown,
+                      size: 16.r,
+                      color: c.textMuted,
+                    ),
                 ],
               ),
             ),
           ),
           _action(c, AppIcons.history, onHistory),
+          Semantics(
+            button: true,
+            label: shareTooltip,
+            child: isSharing
+                ? _sharingAction(c)
+                : _action(c, AppIcons.share, onShare),
+          ),
           _action(c, AppIcons.save, onSave, highlighted: true),
+          Semantics(
+            button: true,
+            label: themeTooltip,
+            child: _action(c, themeIcon, onThemeToggle),
+          ),
           _action(c, AppIcons.settings, onSettings),
         ],
+      ),
+    );
+  }
+
+  Widget _sharingAction(AppColors c) {
+    return SizedBox(
+      width: 42,
+      height: 38,
+      child: Center(
+        child: SizedBox.square(
+          dimension: 17.r,
+          child: CircularProgressIndicator(strokeWidth: 1.8, color: c.accent),
+        ),
       ),
     );
   }

@@ -28,6 +28,7 @@ erDiagram
         int    id             PK
         int    calculation_id FK
         int    position       "0-based order in the sheet"
+        string entry_type     "expression | subtotal"
         string raw_expression "exact tokens, e.g. 100+200*3"
         string computed_value "evaluated signed result (decimal string)"
         string comment        "nullable note"
@@ -60,6 +61,7 @@ CREATE TABLE lines (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   calculation_id INTEGER NOT NULL,
   position       INTEGER NOT NULL,            -- 0-based order within the sheet
+  entry_type     TEXT    NOT NULL DEFAULT 'expression',
   raw_expression TEXT    NOT NULL DEFAULT '', -- exact tokens, e.g. "100+200*3"
   computed_value TEXT    NOT NULL DEFAULT '0',-- evaluated signed result (decimal)
   comment        TEXT,                        -- optional note
@@ -99,8 +101,9 @@ Compute with the `decimal` package and store/round at display time.
 | Field | Meaning |
 |---|---|
 | `position` | 0-based order in the sheet. Re-index on insert / delete / reorder. |
+| `entry_type` | `expression` = calculator row; `subtotal` = persisted `=` checkpoint. Existing v1 rows migrate to `expression`. |
 | `raw_expression` | Source of truth — the exact tokens the user typed (`100+200*3`). The evaluator re-parses this; the editor re-loads it when a line is focused. |
-| `computed_value` | Cached evaluated result, signed, decimal string. |
+| `computed_value` | Expression result, or the running total above a `subtotal` marker, stored as a decimal string. |
 | `comment` | Optional. May be `NULL` or empty. A line can be comment-only as a section header (then `computed_value = 0`, excluded from total). |
 | `is_error` | `1` if the expression is invalid / incomplete / divides by zero. Error lines are **excluded** from the total. |
 
@@ -122,12 +125,12 @@ percent     := "%"                // postfix modifier, does NOT count as an oper
 ```
 
 Rules:
-- **Input cap — changed from v1 (2 → 1 binary operator).** By product decision
-  a line may now hold a leading join operator (§6) **plus at most one** binary
-  operator. Pressing a further operator commits the line and descends to a new
-  one (carrying that operator). The *evaluator* still accepts up to 3 operands /
-  2 binary operators so older saved lines keep working; only live **input** is
-  capped at one.
+- **Input cap — changed from v1 (2 → 1 binary operator).** A line may hold a
+  leading join operator (§6) plus at most one binary `× / ÷` operator during
+  live input. On a valid expression, `+ / −` always commit the row and open the
+  next row carrying that operator. A further `× / ÷` at the cap does the same.
+  The evaluator still accepts up to 3 operands / 2 binary operators so older
+  saved expressions keep working.
 - **Precedence:** `* /` bind before `+ -`. Parentheses override.
 - **Leading unary minus** allowed at the start of the line, after `(`, and after
   a binary operator.
@@ -150,7 +153,16 @@ Rules:
   while such a line is still empty the number / `.` / `( ) %` keys are
   **disabled** until an operator is pressed.
 - **Operator replace:** pressing an operator when the previous token is already
-  an operator replaces it (`5 +` then `*` → `5 *`).
+  an operator replaces it (`5 +` then `*` → `5 *`), except that changing a
+  trailing `× / ÷` to `+ / −` settles the valid prefix and opens the additive
+  operator on the next row (`5 ×` then `+` → rows `5`, `+`).
+- **Add/subtract descent:** on a valid, complete row, pressing `+` or `−`
+  commits it and opens the next row with that leading join. On an empty row the
+  operator is written in place. A trailing operator is normally replaced; the
+  trailing-multiply/divide exception above descends when its prefix is valid.
+- **Multiply/divide in place:** `×` and `÷` stay in the current row while its
+  one-binary-operator cap allows it. At the cap, a valid row is committed and a
+  continuation row opens with the new operator.
 - **New-line is blocked while the line is incomplete** — empty, only an
   operator, or ending in a dangling operator (`200 *`). It commits the line and
   creates a new empty line below **only** when the line parses to a valid
@@ -162,6 +174,10 @@ Rules:
   confirmation.
 - **Division by zero / invalid:** set `is_error = 1`; the line is excluded from
   the total (and visually flagged), no crash.
+- **Equals / subtotal:** `=` on a valid active expression inserts a non-editable
+  `subtotal` marker and then a fresh continuation row. Blank, incomplete, or
+  invalid rows do nothing; repeated `=` without another expression does not
+  duplicate the marker. `⌫` on the fresh row removes both it and the marker.
 
 ---
 
@@ -181,10 +197,11 @@ A line may start with a **join operator** (`+ − × ÷`):
 
 ```
 total = 0
-for each line in order where is_error = 0 and the line has an expression:
-    add:  total += v            # v = signed value of the whole line
-    mul:  total *= operand
-    div:  total /= operand      # operand ≠ 0 (else the line is is_error)
+for each row in order:
+    expression + add:  total += v
+    expression + mul:  total *= operand
+    expression + div:  total /= operand
+    subtotal:           store/display current total; do not change it
 ```
 
 Example: `100` → `×2` → `−50` gives `100 → 200 → 150`.
@@ -195,6 +212,12 @@ value for an add line, the magnitude for a `× / ÷` line). Recomputed live on
 every keystroke / add / edit / delete, then written to
 `calculations.cached_total`.
 
+Subtotal markers are dynamic checkpoints: editing an expression above one
+recomputes that marker from every valid expression physically above it. They do
+not reset the tape, so later rows continue from the same running total. Error
+rows remain excluded and do not prevent a later valid row from creating a
+subtotal.
+
 ---
 
 ## 7. Persistence strategy
@@ -202,6 +225,8 @@ every keystroke / add / edit / delete, then written to
 **SQLite** (the two tables above):
 - The active sheet is continuously written as a draft (`is_draft = 1`) so it
   survives the app being killed.
+- Subtotal markers are stored in `lines` with `entry_type = 'subtotal'`; they
+  survive draft reloads and appear in saved-sheet detail views.
 - **Save** prompts for a name → sets `name`, `is_draft = 0`, then a **fresh
   empty draft** is created and becomes active (the editor "saves and starts a
   new sheet"). Default suggested name = current date/time.
@@ -217,6 +242,12 @@ every keystroke / add / edit / delete, then written to
 - **AC (clear)** wipes the draft's lines (delete the rows; keep or recreate the
   draft row).
 
+### Schema migration
+
+- **v2:** adds `lines.entry_type TEXT NOT NULL DEFAULT 'expression'`.
+- The v1→v2 Drift migration uses the default for every existing row, preserving
+  all legacy expressions, comments, values, ordering, and errors.
+
 **SharedPreferences** (simple key-values — not in SQLite):
 | Key | Purpose |
 |---|---|
@@ -229,7 +260,25 @@ every keystroke / add / edit / delete, then written to
 
 ---
 
-## 8. Worked example (the original "مصاريف الشهر")
+## 8. Sheet export
+
+- The active calculator sheet exposes one Share action with Image and PDF
+  choices. Saved-sheet detail exposes both choices as direct actions.
+- A single display-ready export document feeds both formats. It contains the
+  sheet title/date, numbered expression rows, comments, section headers,
+  excluded errors, subtotal markers, currency, final total, and page numbers.
+- PDF uses A4 pages with automatic pagination and a repeating table header.
+- Image export rasterizes every PDF page to PNG. A short sheet shares one image;
+  a long sheet shares all page images together, avoiding an unbounded tall
+  bitmap while preserving every row.
+- Export is theme-independent: PDF and PNG output always use the light design
+  palette and an opaque `appBg` page fill. The Notaleq mark and brand name appear
+  in the page header. Operators are rendered separately from their amounts with
+  bold accent styling, and vertical rules separate the table columns.
+
+---
+
+## 9. Worked example (the original "مصاريف الشهر")
 
 Sheet `name = "مصاريف الشهر"`:
 
@@ -248,11 +297,9 @@ Sheet `name = "مصاريف الشهر"`:
 
 ---
 
-## 9. Out of scope (v1) — future ideas
+## 10. Out of scope (v1) — future ideas
 
 - Soulver-style **line references** (e.g. "10% of the total above").
 - **Currency conversion** (Samsung's own calculator still lacks this — a real
   differentiator).
 - **Cloud sync** (would require UUID PKs + a sync layer).
-- **Export / share** as PDF or image (you already have this pattern from
-  Al-Daftar).

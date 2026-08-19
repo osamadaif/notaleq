@@ -30,8 +30,10 @@ class AppLocalizations {
   ];
 
   static AppLocalizations of(BuildContext context) {
-    final instance =
-        Localizations.of<AppLocalizations>(context, AppLocalizations);
+    final instance = Localizations.of<AppLocalizations>(
+      context,
+      AppLocalizations,
+    );
     assert(instance != null, 'AppLocalizations not found in context');
     return instance!;
   }
@@ -40,9 +42,11 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   Future<void> load() async {
-    final raw =
-        await rootBundle.loadString(AppAssets.translations(locale.languageCode));
-    final Map<String, dynamic> decoded = json.decode(raw) as Map<String, dynamic>;
+    final raw = await rootBundle.loadString(
+      AppAssets.translations(locale.languageCode),
+    );
+    final Map<String, dynamic> decoded =
+        json.decode(raw) as Map<String, dynamic>;
     _strings = decoded.map((k, v) => MapEntry(k, v.toString()));
   }
 
@@ -51,7 +55,9 @@ class AppLocalizations {
   String tr(String key, {Map<String, String>? params}) {
     var value = _strings[key];
     if (value == null) {
-      if (kDebugMode) debugPrint('Missing translation: $key (${locale.languageCode})');
+      if (kDebugMode) {
+        debugPrint('Missing translation: $key (${locale.languageCode})');
+      }
       return key;
     }
     if (params != null) {
@@ -66,9 +72,9 @@ class _AppLocalizationsDelegate
   const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      AppLocalizations.supportedLocales
-          .any((l) => l.languageCode == locale.languageCode);
+  bool isSupported(Locale locale) => AppLocalizations.supportedLocales.any(
+    (l) => l.languageCode == locale.languageCode,
+  );
 
   @override
   Future<AppLocalizations> load(Locale locale) async {

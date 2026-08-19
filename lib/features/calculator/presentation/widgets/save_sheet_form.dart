@@ -10,7 +10,10 @@ import '../../../../core/widgets/app_buttons.dart';
 
 /// Shows the "Save sheet" bottom sheet (name prefilled). Returns the chosen
 /// name, or null if cancelled.
-Future<String?> showSaveSheet(BuildContext context, {required String initialName}) {
+Future<String?> showSaveSheet(
+  BuildContext context, {
+  required String initialName,
+}) {
   return showAppBottomSheet<String>(
     context: context,
     title: context.tr(LangKeys.saveSheet),
@@ -27,8 +30,9 @@ class _SaveSheetForm extends StatefulWidget {
 }
 
 class _SaveSheetFormState extends State<_SaveSheetForm> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initialName);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialName,
+  );
 
   @override
   void dispose() {
@@ -65,8 +69,7 @@ class _SaveSheetFormState extends State<_SaveSheetForm> {
             style: AppTextStyles.body.copyWith(color: c.textPrimary),
             decoration: InputDecoration(
               isCollapsed: true,
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: AppSpacing.md + 1),
+              contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.md + 1),
               border: InputBorder.none,
               hintText: context.tr(LangKeys.sheetNameHint),
               hintStyle: AppTextStyles.body.copyWith(color: c.textMuted),

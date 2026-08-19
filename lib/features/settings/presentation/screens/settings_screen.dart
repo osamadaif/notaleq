@@ -33,7 +33,10 @@ class SettingsScreen extends StatelessWidget {
       code == null ? context.tr(LangKeys.themeSystem) : _languageNames[code]!;
 
   Future<void> _pickLanguage(
-      BuildContext context, SettingsCubit cubit, String? current) {
+    BuildContext context,
+    SettingsCubit cubit,
+    String? current,
+  ) {
     final c = context.colors;
     final codes = <String?>[null, ..._languageNames.keys];
     return showAppBottomSheet<void>(
@@ -57,8 +60,7 @@ class SettingsScreen extends StatelessWidget {
                         _languageLabel(context, code),
                         style: AppTextStyles.body.copyWith(
                           color: code == current ? c.accent : c.textPrimary,
-                          fontWeight:
-                              code == current ? FontWeight.w600 : null,
+                          fontWeight: code == current ? FontWeight.w600 : null,
                         ),
                       ),
                     ),
@@ -78,7 +80,10 @@ class SettingsScreen extends StatelessWidget {
       : context.tr(Currencies.nameKey(code));
 
   Future<void> _pickCurrency(
-      BuildContext context, SettingsCubit cubit, String? current) {
+    BuildContext context,
+    SettingsCubit cubit,
+    String? current,
+  ) {
     final c = context.colors;
     final codes = <String?>[null, ...Currencies.codes];
     return showAppBottomSheet<void>(
@@ -106,24 +111,28 @@ class SettingsScreen extends StatelessWidget {
                           child: Text(
                             _currencyLabel(context, code),
                             style: AppTextStyles.body.copyWith(
-                              color:
-                                  code == current ? c.accent : c.textPrimary,
-                              fontWeight:
-                                  code == current ? FontWeight.w600 : null,
+                              color: code == current ? c.accent : c.textPrimary,
+                              fontWeight: code == current
+                                  ? FontWeight.w600
+                                  : null,
                             ),
                           ),
                         ),
                         if (code != null) ...[
                           Text(
                             context.tr(Currencies.symbolKey(code)),
-                            style: AppTextStyles.body
-                                .copyWith(color: c.textMuted),
+                            style: AppTextStyles.body.copyWith(
+                              color: c.textMuted,
+                            ),
                           ),
                           SizedBox(width: AppSpacing.md),
                         ],
                         if (code == current)
-                          AppSvgIcon(AppIcons.commit,
-                              size: 18, color: c.accent),
+                          AppSvgIcon(
+                            AppIcons.commit,
+                            size: 18,
+                            color: c.accent,
+                          ),
                       ],
                     ),
                   ),
@@ -153,11 +162,12 @@ class SettingsScreen extends StatelessWidget {
         builder: (context, state) {
           return ListView(
             padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
             children: [
               InkWell(
-                onTap: () =>
-                    _pickLanguage(context, cubit, state.languageCode),
+                onTap: () => _pickLanguage(context, cubit, state.languageCode),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
                   child: Row(
@@ -165,8 +175,9 @@ class SettingsScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           context.tr(LangKeys.language),
-                          style: AppTextStyles.body
-                              .copyWith(color: c.textPrimary),
+                          style: AppTextStyles.body.copyWith(
+                            color: c.textPrimary,
+                          ),
                         ),
                       ),
                       Text(
@@ -174,8 +185,11 @@ class SettingsScreen extends StatelessWidget {
                         style: AppTextStyles.body.copyWith(color: c.textMuted),
                       ),
                       SizedBox(width: AppSpacing.xs),
-                      AppSvgIcon(AppIcons.chevronDown,
-                          size: 16, color: c.textMuted),
+                      AppSvgIcon(
+                        AppIcons.chevronDown,
+                        size: 16,
+                        color: c.textMuted,
+                      ),
                     ],
                   ),
                 ),
@@ -200,8 +214,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               _divider(c),
               InkWell(
-                onTap: () =>
-                    _pickCurrency(context, cubit, state.currencyCode),
+                onTap: () => _pickCurrency(context, cubit, state.currencyCode),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
                   child: Row(
@@ -209,8 +222,9 @@ class SettingsScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           context.tr(LangKeys.currency),
-                          style: AppTextStyles.body
-                              .copyWith(color: c.textPrimary),
+                          style: AppTextStyles.body.copyWith(
+                            color: c.textPrimary,
+                          ),
                         ),
                       ),
                       Text(
@@ -218,8 +232,11 @@ class SettingsScreen extends StatelessWidget {
                         style: AppTextStyles.body.copyWith(color: c.textMuted),
                       ),
                       SizedBox(width: AppSpacing.xs),
-                      AppSvgIcon(AppIcons.chevronDown,
-                          size: 16, color: c.textMuted),
+                      AppSvgIcon(
+                        AppIcons.chevronDown,
+                        size: 16,
+                        color: c.textMuted,
+                      ),
                     ],
                   ),
                 ),
@@ -231,14 +248,17 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: cubit.setThemeMode,
                 segments: [
                   SegmentOption(
-                      label: context.tr(LangKeys.themeLight),
-                      value: ThemeMode.light),
+                    label: context.tr(LangKeys.themeLight),
+                    value: ThemeMode.light,
+                  ),
                   SegmentOption(
-                      label: context.tr(LangKeys.themeDark),
-                      value: ThemeMode.dark),
+                    label: context.tr(LangKeys.themeDark),
+                    value: ThemeMode.dark,
+                  ),
                   SegmentOption(
-                      label: context.tr(LangKeys.themeSystem),
-                      value: ThemeMode.system),
+                    label: context.tr(LangKeys.themeSystem),
+                    value: ThemeMode.system,
+                  ),
                 ],
               ),
               _divider(c),
@@ -260,6 +280,7 @@ class SettingsScreen extends StatelessWidget {
                           : '${context.tr(LangKeys.appName)} · ${state.appVersion}',
                       style: AppTextStyles.comment.copyWith(color: c.textMuted),
                     ),
+
                     /// developed by
                     SizedBox(height: AppSpacing.xxl),
                     Row(
@@ -267,7 +288,9 @@ class SettingsScreen extends StatelessWidget {
                       children: [
                         Text(
                           '${context.tr(LangKeys.developedBy)}: ',
-                          style: AppTextStyles.body.copyWith(color: c.textMuted),
+                          style: AppTextStyles.body.copyWith(
+                            color: c.textMuted,
+                          ),
                         ),
                         SizedBox(width: AppSpacing.xs),
                         Text(
@@ -287,12 +310,12 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _section(AppColors c, String label) => Padding(
-        padding: EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
-        child: Text(
-          label,
-          style: AppTextStyles.sectionHeader.copyWith(color: c.textMuted),
-        ),
-      );
+    padding: EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
+    child: Text(
+      label,
+      style: AppTextStyles.sectionHeader.copyWith(color: c.textMuted),
+    ),
+  );
 
   Widget _divider(AppColors c) => Divider(color: c.hairline, height: 1);
 }

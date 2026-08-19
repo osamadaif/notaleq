@@ -75,7 +75,13 @@ treat that file as the source of truth and keep code consistent with it.
   typing). Thousands grouping on the **integer part only**, at display time.
 
 **Interaction:**
-- **Operator replace:** an operator pressed after an operator replaces it.
+- **Operator replace:** an operator pressed after an operator replaces it,
+  except that replacing a trailing `× / ÷` with `+ / −` settles the valid
+  prefix and opens the additive operator on the next row.
+- On a valid row, `+ / −` commit it and start the next row carrying that
+  operator. On an empty row they are written in place. On a trailing-operator
+  row they replace in place unless the multiply/divide exception above applies.
+  `× / ÷` stay in the current row while the input cap allows them.
 - **New-line is blocked while the line is incomplete** (empty / only an operator
   / dangling operator). It commits and descends only when the line is a valid
   expression. Triggers: numpad `↵`, tapping the area below, or the keyboard
@@ -84,14 +90,30 @@ treat that file as the source of truth and keep code consistent with it.
   whole sheet (with confirmation).
 - **Division by zero / invalid** → line flagged `is_error`, excluded from total,
   no crash.
+- **`=`** on a valid expression inserts a persisted, non-editable subtotal and
+  opens a continuation row. The subtotal updates when rows above it change and
+  does not reset the running tape.
+- **Export:** the calculator top bar has one Share action that opens an
+  Image/PDF picker. Saved-sheet detail shows separate Image and PDF actions.
+  The shared A4 document includes the sheet name/date, numbered operation table,
+  comments and section headers, excluded errors, subtotals, currency, final
+  total, and page numbering. Long PDFs paginate automatically; Image export
+  shares the rasterized PDF pages as multiple PNG files when needed. Both
+  formats always use the light design palette and an opaque light page
+  background, even while the app is in dark mode. The header uses the bundled
+  Notaleq mark with the app name underneath; operators are bold accent glyphs
+  separated from their amounts, and table columns have vertical dividers.
 
-**Total** = sum of all non-error line results, recomputed live, cached in
-`calculations.cached_total`.
+**Total** = a running tape over non-error expression rows: leading `+ / −` add a
+signed value, while leading `× / ÷` multiply or divide the running result.
+Subtotal markers display the total above them without changing it. The final
+total is recomputed live and cached in `calculations.cached_total`.
 
 **Persistence:** active sheet auto-saved as a draft (`is_draft = 1`) so it
 survives app kill. "Save" sets a name (`is_draft = 0`). History = saved sheets
-by `updated_at`, searchable by name/date. Settings + `active_calculation_id` live
-in `shared_preferences`.
+by `updated_at`, searchable by name/date and opened read-only. `lines.entry_type`
+stores `expression` / `subtotal`; schema v2 migrates v1 rows to `expression`.
+Settings + `active_calculation_id` live in `shared_preferences`.
 
 ---
 
@@ -113,7 +135,8 @@ in `shared_preferences`.
 - **Key feedback on every press:** haptic + click sound + a visible pressed
   state (the button should clearly look depressed). Feedback respects the user
   toggles + system silent mode.
-- **History screen:** saved sheets listed by name/date, searchable, tap to load.
+- **History screen:** saved sheets listed by name/date, searchable, tap to view
+  read-only detail.
 - **Light + dark themes.**
 
 ---

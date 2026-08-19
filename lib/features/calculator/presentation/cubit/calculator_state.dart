@@ -2,6 +2,7 @@ import 'package:decimal/decimal.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../domain/entities/ledger_line.dart';
+import '../../domain/ledger_totals.dart';
 
 part 'calculator_state.freezed.dart';
 
@@ -26,11 +27,6 @@ sealed class CalculatorState with _$CalculatorState {
     /// keyboard up, numpad swapped out).
     @Default(false) bool commentEditing,
 
-    /// Whether a line is currently focused (the enlarged, caret-lit active row).
-    /// Pressing `=` blurs it (`false`) so the sheet reads as a settled result;
-    /// any edit or tap re-engages it (`true`).
-    @Default(true) bool focused,
-
     /// Bumped each time a non-operator key is rejected on a line that still
     /// needs a leading operator — the screen shows a quick notice.
     @Default(0) int operatorNoticeTick,
@@ -39,10 +35,9 @@ sealed class CalculatorState with _$CalculatorState {
 
   bool get isDraft => sheetName == null || sheetName!.trim().isEmpty;
 
-  LedgerLine? get activeLine =>
-      (activeIndex >= 0 && activeIndex < lines.length)
-          ? lines[activeIndex]
-          : null;
+  LedgerLine? get activeLine => (activeIndex >= 0 && activeIndex < lines.length)
+      ? lines[activeIndex]
+      : null;
 
   /// Every line after the first value line must begin with a join operator
   /// (tape model). True when the active line is still empty *and* a value line
@@ -51,32 +46,20 @@ sealed class CalculatorState with _$CalculatorState {
   bool get requiresLeadingOperator {
     final active = activeLine;
     if (active == null) return true;
-    if (active.rawExpression.isNotEmpty) return false; // operator already placed
+    if (active.rawExpression.isNotEmpty) {
+      return false; // operator already placed
+    }
     for (var i = 0; i < activeIndex; i++) {
-      if (lines[i].hasExpression) return true; // a value line precedes it
+      if (lines[i].hasExpression) {
+        return true; // a value line precedes it
+      }
     }
     return false; // this is the first value line — exempt
   }
 
   /// Running tape total: each valid line joins the result above it by its
   /// [LedgerJoin] (add a signed value, or multiply/divide by a magnitude).
-  Decimal get total {
-    var total = Decimal.zero;
-    for (final line in lines) {
-      if (!line.countsTowardTotal) continue;
-      switch (line.join) {
-        case LedgerJoin.add:
-          total += line.computedValue;
-        case LedgerJoin.mul:
-          total *= line.computedValue;
-        case LedgerJoin.div:
-          if (line.computedValue == Decimal.zero) continue;
-          total = (total / line.computedValue)
-              .toDecimal(scaleOnInfinitePrecision: 20);
-      }
-    }
-    return total;
-  }
+  Decimal get total => LedgerTotals.calculate(lines);
 
   /// Lines that actually carry content (for the top-bar "{n} lines" meta).
   int get contentLineCount =>

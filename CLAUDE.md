@@ -20,11 +20,13 @@ keep technical terms in English.
 **Clean Architecture + feature modules.** Feature code lives under
 `lib/features/<feature>/`; shared infrastructure under `lib/core/`.
 
-Three features:
+Four features:
 
 - `calculator` — the editor: lines + custom numpad + live total. (Hub screen.)
-- `history` — saved sheets (`is_draft = 0`), search by name/date, tap to load.
+- `history` — saved sheets (`is_draft = 0`), search by name/date, tap to view.
 - `settings` — sound / haptic / decimal_places / theme / currency.
+- `export` — builds the shared sheet document, paginated PDF, and PNG page
+  images used by both the calculator and saved-sheet detail.
 
 ### Core layer (`lib/core/`)
 
@@ -93,7 +95,7 @@ these tokens.
 - Calculator → `features/calculator/presentation/widgets/`: `numpad_key.dart`
   (families digit/operator/function/commit; default/pressed/disabled states),
   `numpad.dart`, `ledger_row.dart` (header/normal/negative/active/error/
-  amount-only variants), `total_bar.dart`, `ledger_top_bar.dart`.
+  amount-only variants), `subtotal_row.dart`, `total_bar.dart`, `ledger_top_bar.dart`.
 - History → `features/history/presentation/widgets/`: `history_list_item.dart`.
 
 All widgets are **pure presentation** — they take display-ready strings + enums +
@@ -124,6 +126,24 @@ Use the **`decimal`** package. Amounts are stored/computed as **decimal strings*
 — **never `double`** (`0.1 + 0.2` breaks). Format for display with `intl`
 `NumberFormat` (Western digits `0-9`, `,` thousands on the integer part only,
 `.` decimal). Presentation widgets receive **already-formatted** strings.
+
+## Calculator interaction
+
+- On a valid expression, `+ / −` commit the current row and open the next row
+  carrying that operator. On empty/incomplete rows, operators keep the existing
+  append/replace behavior, except replacing a trailing `× / ÷` with `+ / −`
+  settles the valid prefix and opens the additive operator on the next row.
+  `× / ÷` remain in the same row while its input cap allows them.
+- `=` inserts a persisted, non-editable subtotal marker plus a fresh continuation
+  row. Subtotals recompute from the expression rows above them, do not reset the
+  running tape, survive draft reloads, and appear in saved-sheet detail views.
+- The calculator top bar shares the current sheet through an Image/PDF picker.
+  Saved-sheet detail exposes both actions directly. PDF output is paginated A4;
+  Image output is one PNG for a one-page sheet or multiple PNG pages for a long
+  sheet. Both formats include comments, section rows, errors, subtotals, and the
+  final total. Export rendering always uses the light design palette regardless
+  of the app theme, fills the complete page background, and includes the bundled
+  Notaleq mark above the brand name.
 
 ## Dependency injection (conventions)
 
@@ -156,7 +176,9 @@ Runtime: `flutter_bloc` (Cubit) · `get_it` (DI) · `drift` + `sqlite3_flutter_l
 (`Either<Failures,T>`) · `decimal` (money) · `shared_preferences`
 (settings + `active_calculation_id`) · `intl` (`NumberFormat`) ·
 `freezed_annotation` (state annotations) · `flutter_localizations` (SDK; Arabic
-RTL Material localization) · `flutter_svg` (renders the exact design icon set).
+RTL Material localization) · `flutter_svg` (renders the exact design icon set) ·
+`pdf` (A4 document generation) · `printing` (PDF page rasterization) ·
+`share_plus` (native file share sheet).
 
 Dev: `build_runner` · `drift_dev` · `freezed` · `flutter_lints`.
 
@@ -170,8 +192,9 @@ built-in `HapticFeedback`.
 ## Persistence summary (see `SCHEMA.md`)
 
 - SQLite (drift), two tables: `calculations` (draft `is_draft=1` + saved sheets
-  `is_draft=0`, with `cached_total`) and `lines`. A drift `watch()` over lines
-  makes the live total + history list reactive for free.
+  `is_draft=0`, with `cached_total`) and `lines`. `lines.entry_type` distinguishes
+  calculation rows from persisted subtotal markers. Schema v2 adds this column;
+  the v1→v2 migration defaults every existing row to `expression`.
 - SharedPreferences: `active_calculation_id`, `sound_enabled`, `haptic_enabled`,
   `decimal_places` (default 2), `currency_code`, `theme_mode`.
 
@@ -197,8 +220,11 @@ lib/
                  stepper_row · segmented_control
     bloc_observer.dart
   features/
-    calculator/  data/repos · domain/{entities,parser,expression_input}
+    calculator/  data/repos · domain/{entities,parser,expression_input,ledger_totals}
                  presentation/{cubit,screens,widgets}        # ← implemented
+    export/      data/{sheet_export_pdf_builder,sheet_export_service}
+                 domain/sheet_export_document
+                 presentation/sheet_export_ui                # ← implemented
     history/     data/repos · presentation/{cubit,screens,widgets}  # ← implemented
     settings/    data/repos · presentation/{cubit,screens,widgets}  # ← implemented
   main.dart

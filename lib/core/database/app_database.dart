@@ -39,6 +39,10 @@ class Lines extends Table {
   /// 0-based order within the sheet.
   IntColumn get position => integer()();
 
+  /// `expression` for a calculator row; `subtotal` for an `=` marker.
+  TextColumn get entryType =>
+      text().withDefault(const Constant('expression'))();
+
   /// Exact tokens the user typed, e.g. "100+200*3". Source of truth.
   TextColumn get rawExpression => text().withDefault(const Constant(''))();
 
@@ -52,10 +56,7 @@ class Lines extends Table {
   IntColumn get isError => integer().withDefault(const Constant(0))();
 }
 
-@DriftDatabase(
-  tables: [Calculations, Lines],
-  daos: [CalculationsDao, LinesDao],
-)
+@DriftDatabase(tables: [Calculations, Lines], daos: [CalculationsDao, LinesDao])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -63,24 +64,32 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-          // Indexes per SCHEMA.md (incl. the DESC on updated_at).
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_lines_calc ON lines (calculation_id, position)');
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_calc_updated ON calculations (updated_at DESC)');
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_calc_is_draft ON calculations (is_draft)');
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
+    onCreate: (m) async {
+      await m.createAll();
+      // Indexes per SCHEMA.md (incl. the DESC on updated_at).
+      await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_lines_calc ON lines (calculation_id, position)',
       );
+      await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_calc_updated ON calculations (updated_at DESC)',
+      );
+      await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_calc_is_draft ON calculations (is_draft)',
+      );
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(lines, lines.entryType);
+      }
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 }
 
 LazyDatabase _openConnection() {
@@ -150,8 +159,8 @@ class CalculationsDao extends DatabaseAccessor<AppDatabase>
       variables: [Variable.withString('%$escaped%')],
       readsFrom: {calculations},
     ).watch().map(
-          (rows) => rows.map((row) => calculations.map(row.data)).toList(),
-        );
+      (rows) => rows.map((row) => calculations.map(row.data)).toList(),
+    );
   }
 
   /// Caches the latest total and bumps `updatedAt`.
@@ -173,8 +182,9 @@ class CalculationsDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> touch(int id) {
-    return (update(calculations)..where((c) => c.id.equals(id)))
-        .write(CalculationsCompanion(updatedAt: Value(_now)));
+    return (update(calculations)..where((c) => c.id.equals(id))).write(
+      CalculationsCompanion(updatedAt: Value(_now)),
+    );
   }
 
   /// Deletes a sheet; its lines cascade away.

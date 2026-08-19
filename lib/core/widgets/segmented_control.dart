@@ -31,7 +31,13 @@ class SegmentedControl<T> extends StatelessWidget {
       child: Row(
         children: [
           for (final segment in segments)
-            Expanded(child: _Segment(segment: segment, selected: segment.value == value, onTap: () => onChanged(segment.value))),
+            Expanded(
+              child: _Segment(
+                segment: segment,
+                selected: segment.value == value,
+                onTap: () => onChanged(segment.value),
+              ),
+            ),
         ],
       ),
     );

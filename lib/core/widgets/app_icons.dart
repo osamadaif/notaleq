@@ -12,10 +12,15 @@ class AppIcons {
 
   static const String history = '$_base/history.svg';
   static const String save = '$_base/save.svg';
+  static const String share = '$_base/share.svg';
+  static const String image = '$_base/image.svg';
+  static const String pdf = '$_base/pdf.svg';
   static const String settings = '$_base/settings.svg';
   static const String search = '$_base/search.svg';
   static const String delete = '$_base/delete.svg';
   static const String backspace = '$_base/backspace.svg';
+  static const String moon = '$_base/moon.svg';
+  static const String sun = '$_base/sun.svg';
 
   /// ✓✓ — commit / line-valid.
   static const String commit = '$_base/commit.svg';
@@ -37,12 +42,7 @@ class AppIcons {
 
 /// Renders an [AppIcons] SVG asset at [size], tinted to [color].
 class AppSvgIcon extends StatelessWidget {
-  const AppSvgIcon(
-    this.asset, {
-    super.key,
-    this.size = 24,
-    this.color,
-  });
+  const AppSvgIcon(this.asset, {super.key, this.size = 24, this.color});
 
   final String asset;
   final double size;

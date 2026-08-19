@@ -112,6 +112,9 @@ class ExpressionInput {
     return !(binaryOperatorCount(raw) >= 1 && _isOperandEnd(last));
   }
 
+  static bool endsWithOperator(String raw) =>
+      raw.isNotEmpty && _isOperator(raw[raw.length - 1]);
+
   // --- helpers ---
 
   static String _currentNumber(String raw) {

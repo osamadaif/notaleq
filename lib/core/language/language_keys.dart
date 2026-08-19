@@ -13,6 +13,7 @@ class LangKeys {
   // Calculator / ledger
   static const String draft = 'draft';
   static const String total = 'total';
+  static const String subtotal = 'subtotal';
   static const String newLine = 'new_line';
   static const String excluded = 'excluded';
   static const String noComment = 'no_comment';
@@ -26,6 +27,17 @@ class LangKeys {
   static const String cancel = 'cancel';
   static const String delete = 'delete';
   static const String clearAll = 'clear_all';
+  static const String shareSheet = 'share_sheet';
+  static const String exportImage = 'export_image';
+  static const String exportImageHint = 'export_image_hint';
+  static const String exportPdf = 'export_pdf';
+  static const String exportPdfHint = 'export_pdf_hint';
+  static const String operation = 'operation';
+  static const String details = 'details';
+  static const String page = 'page';
+  static const String createdWith = 'created_with';
+  static const String exportFailed = 'export_failed';
+  static const String nothingToExport = 'nothing_to_export';
 
   // Save sheet
   static const String saveSheet = 'save_sheet';

@@ -20,20 +20,25 @@ void main() {
 
   test('lines are returned ordered by position', () async {
     final id = await db.calculationsDao.createDraft();
-    await db.linesDao.insertLine(LinesCompanion.insert(
-      calculationId: id,
-      position: 1,
-      computedValue: const Value('-1000'),
-    ));
-    await db.linesDao.insertLine(LinesCompanion.insert(
-      calculationId: id,
-      position: 0,
-      computedValue: const Value('10000'),
-    ));
+    await db.linesDao.insertLine(
+      LinesCompanion.insert(
+        calculationId: id,
+        position: 1,
+        computedValue: const Value('-1000'),
+      ),
+    );
+    await db.linesDao.insertLine(
+      LinesCompanion.insert(
+        calculationId: id,
+        position: 0,
+        computedValue: const Value('10000'),
+      ),
+    );
 
     final lines = await db.linesDao.getLines(id);
     expect(lines.map((l) => l.position), [0, 1]);
     expect(lines.first.computedValue, '10000');
+    expect(lines.first.entryType, 'expression');
   });
 
   test('saveAs promotes a draft to a saved, named sheet', () async {
@@ -67,7 +72,8 @@ void main() {
   test('deleting a sheet cascades to its lines', () async {
     final id = await db.calculationsDao.createDraft();
     await db.linesDao.insertLine(
-        LinesCompanion.insert(calculationId: id, position: 0));
+      LinesCompanion.insert(calculationId: id, position: 0),
+    );
 
     await db.calculationsDao.deleteCalculation(id);
 

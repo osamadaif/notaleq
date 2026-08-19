@@ -12,8 +12,10 @@ class AppBlocObserver extends BlocObserver {
   void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
     super.onChange(bloc, change);
     if (kDebugMode) {
-      debugPrint('${bloc.runtimeType}: ${change.currentState} '
-          '→ ${change.nextState}');
+      debugPrint(
+        '${bloc.runtimeType}: ${change.currentState} '
+        '→ ${change.nextState}',
+      );
     }
   }
 

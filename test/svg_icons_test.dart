@@ -3,15 +3,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:notaleq/core/widgets/app_icons.dart';
 
 void main() {
-  testWidgets('all design SVG icons load and render without error',
-      (tester) async {
+  testWidgets('all design SVG icons load and render without error', (
+    tester,
+  ) async {
     const icons = <String>[
       AppIcons.history,
       AppIcons.save,
+      AppIcons.share,
+      AppIcons.image,
+      AppIcons.pdf,
       AppIcons.settings,
       AppIcons.search,
       AppIcons.delete,
       AppIcons.backspace,
+      AppIcons.moon,
+      AppIcons.sun,
       AppIcons.commit,
       AppIcons.newLine,
       AppIcons.commentJump,

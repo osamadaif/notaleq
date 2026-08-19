@@ -44,12 +44,13 @@ class SearchField extends StatelessWidget {
               cursorColor: c.accent,
               decoration: InputDecoration(
                 isCollapsed: true,
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: AppSpacing.md),
+                contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.md),
                 border: InputBorder.none,
                 hintText: hint,
-                hintStyle: AppTextStyles.body
-                    .copyWith(fontSize: 15.sp, color: c.textMuted),
+                hintStyle: AppTextStyles.body.copyWith(
+                  fontSize: 15.sp,
+                  color: c.textMuted,
+                ),
               ),
             ),
           ),

@@ -1,28 +1,36 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'
+    show HapticFeedback, SystemSound, SystemSoundType;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/format/amount_formatter.dart';
 import '../../../../core/format/currencies.dart';
+import '../../../../core/format/ledger_amount_formatter.dart';
 import '../../../../core/language/app_localizations.dart';
 import '../../../../core/language/language_keys.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/style/app_colors.dart';
 import '../../../../core/style/app_dimens.dart';
 import '../../../../core/style/app_text_styles.dart';
+import '../../../../core/widgets/app_icons.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/app_icons.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart';
+import '../../../settings/presentation/cubit/settings_state.dart';
+import '../../../export/data/sheet_export_service.dart';
+import '../../../export/domain/sheet_export_document.dart';
+import '../../../export/presentation/sheet_export_ui.dart';
 import '../../domain/entities/ledger_line.dart';
 import '../cubit/calculator_cubit.dart';
 import '../cubit/calculator_state.dart';
 import '../widgets/ledger_row.dart';
 import '../widgets/ledger_top_bar.dart';
 import '../widgets/numpad.dart';
+import '../widgets/numpad_key.dart';
 import '../widgets/save_sheet_form.dart';
+import '../widgets/subtotal_row.dart';
 import '../widgets/total_bar.dart';
 
 class CalculatorScreen extends StatelessWidget {
@@ -46,6 +54,7 @@ class _CalculatorView extends StatefulWidget {
 
 class _CalculatorViewState extends State<_CalculatorView> {
   static const AmountFormatter _formatter = AmountFormatter();
+  static const LedgerAmountFormatter _ledgerAmounts = LedgerAmountFormatter();
 
   final TextEditingController _commentController = TextEditingController();
   final FocusNode _commentFocus = FocusNode();
@@ -54,6 +63,7 @@ class _CalculatorViewState extends State<_CalculatorView> {
   int _lastLineCount = 0;
   int _lastActiveIndex = -1;
   bool _lastCommentEditing = false;
+  bool _isExporting = false;
 
   @override
   void initState() {
@@ -95,33 +105,77 @@ class _CalculatorViewState extends State<_CalculatorView> {
 
   /// Settled-line amount: the operand prefixed by its join (+ / − / × / ÷). The
   /// first/base line (no leading operator) shows the bare value.
-  String _settledAmount(LedgerLine line, int decimalPlaces) {
-    // An excluded (error) line shows what was typed — not its zeroed value —
-    // next to the "excluded" pill, so the user can see what failed.
-    if (line.isHardError) {
-      return _formatter.formatExpression(line.rawExpression);
-    }
-    final value = _formatter.format(
-      line.computedValue,
+  LedgerAmountDisplay _settledDisplay(LedgerLine line, int decimalPlaces) {
+    return _ledgerAmounts.format(
+      rawExpression: line.rawExpression,
+      computedAmount: line.computedValue,
+      isError: line.isHardError,
       decimalPlaces: decimalPlaces,
     );
-    switch (line.join) {
-      case LedgerJoin.mul:
-        return '×$value';
-      case LedgerJoin.div:
-        return '÷$value';
-      case LedgerJoin.add:
-        // A subsequent add line begins with a + / − join — show that sign like
-        // the other operators. Negatives already carry the − glyph; only a
-        // non-negative join line needs an explicit leading +.
-        final lead = line.rawExpression.trimLeft();
-        final isJoinLine = lead.isNotEmpty &&
-            (lead[0] == '+' || lead[0] == '-' || lead[0] == '−');
-        if (isJoinLine && line.computedValue >= Decimal.zero) {
-          return '+$value';
-        }
-        return value;
+  }
+
+  Future<void> _onShare(
+    BuildContext context,
+    CalculatorState state,
+    SettingsState settings,
+  ) async {
+    if (!state.lines.any((line) => !line.isBlank)) {
+      _showExportMessage(context, LangKeys.nothingToExport);
+      return;
     }
+    final format = await showSheetExportOptions(context);
+    if (format == null || !context.mounted) return;
+    setState(() => _isExporting = true);
+    try {
+      await _shareDocument(context, state, settings, format);
+    } on SheetExportException {
+      if (context.mounted) _showExportMessage(context, LangKeys.exportFailed);
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
+  Future<void> _shareDocument(
+    BuildContext context,
+    CalculatorState state,
+    SettingsState settings,
+    SheetExportFormat format,
+  ) async {
+    final document = _exportDocument(context, state, settings);
+    return getIt<SheetExportService>().share(
+      document,
+      sheetShareOrigin(context),
+      format,
+    );
+  }
+
+  SheetExportDocument _exportDocument(
+    BuildContext context,
+    CalculatorState state,
+    SettingsState settings,
+  ) {
+    final totalText = _formatter.format(
+      state.total,
+      decimalPlaces: settings.decimalPlaces,
+    );
+    final viewData = SheetExportViewData(
+      title: state.isDraft ? context.tr(LangKeys.draft) : state.sheetName!,
+      dateText: DateFormat('yyyy/MM/dd | HH:mm').format(DateTime.now()),
+      totalText: totalText,
+      lineCount: state.contentLineCount,
+      decimalPlaces: settings.decimalPlaces,
+      currency: _currencySymbol(context, settings.currencyCode),
+    );
+    return SheetExportDocument.fromLedger(
+      state.lines,
+      sheetExportRequestOf(context, viewData),
+    );
+  }
+
+  void _showExportMessage(BuildContext context, String key) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(context.tr(key))));
   }
 
   Future<void> _onSave(BuildContext context, CalculatorState state) async {
@@ -135,10 +189,10 @@ class _CalculatorViewState extends State<_CalculatorView> {
         );
       return;
     }
-    final defaultName = state.isDraft
-        ? DateFormat('yyyy/MM/dd · HH:mm').format(DateTime.now())
-        : state.sheetName!;
-    final name = await showSaveSheet(context, initialName: defaultName);
+    // final defaultName = state.isDraft
+    //     ? DateFormat('yyyy/MM/dd · HH:mm').format(DateTime.now())
+    //     : state.sheetName!;
+    final name = await showSaveSheet(context, initialName: '');
     if (name != null) await cubit.save(name);
   }
 
@@ -159,6 +213,16 @@ class _CalculatorViewState extends State<_CalculatorView> {
   /// is never repointed at a saved sheet, so saved sheets can't be overwritten.
   void _onHistory(BuildContext context) {
     Navigator.of(context).pushNamed(AppRoutes.history);
+  }
+
+  void _toggleCommentFocus(SettingsState settings) {
+    if (settings.hapticEnabled) HapticFeedback.mediumImpact();
+    if (settings.soundEnabled) SystemSound.play(SystemSoundType.click);
+    if (_commentFocus.hasFocus) {
+      _commentFocus.unfocus();
+    } else {
+      _commentFocus.requestFocus();
+    }
   }
 
   @override
@@ -229,6 +293,7 @@ class _CalculatorViewState extends State<_CalculatorView> {
             }
             final cubit = context.read<CalculatorCubit>();
             final settings = context.watch<SettingsCubit>().state;
+            final darkTheme = Theme.of(context).brightness == Brightness.dark;
             final dp = settings.decimalPlaces;
             // The running total walks every line — compute (and format) it once
             // per build and share it between the top bar and the total bar.
@@ -250,9 +315,22 @@ class _CalculatorViewState extends State<_CalculatorView> {
                     title: state.isDraft
                         ? context.tr(LangKeys.draft)
                         : state.sheetName!,
+                    themeIcon: darkTheme ? AppIcons.sun : AppIcons.moon,
+                    themeTooltip: context.tr(
+                      darkTheme ? LangKeys.themeLight : LangKeys.themeDark,
+                    ),
+                    shareTooltip: context.tr(LangKeys.shareSheet),
                     meta: '${state.contentLineCount} · $totalText',
                     onHistory: () => _onHistory(context),
+                    onShare: _isExporting
+                        ? null
+                        : () => _onShare(context, state, settings),
+                    isSharing: _isExporting,
                     onSave: () => _onSave(context, state),
+                    onThemeToggle: () =>
+                        context.read<SettingsCubit>().setThemeMode(
+                          darkTheme ? ThemeMode.light : ThemeMode.dark,
+                        ),
                     onSettings: () =>
                         Navigator.of(context).pushNamed(AppRoutes.settings),
                   ),
@@ -265,10 +343,29 @@ class _CalculatorViewState extends State<_CalculatorView> {
                     AppSpacing.md,
                     AppSpacing.sm,
                   ),
-                  child: TotalBar(
-                    label: context.tr(LangKeys.total),
-                    totalText: totalText,
-                    currency: _currencySymbol(context, settings.currencyCode),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TotalBar(
+                          label: context.tr(LangKeys.total),
+                          totalText: totalText,
+                          currency: _currencySymbol(
+                            context,
+                            settings.currencyCode,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: AppSpacing.sm),
+                      SizedBox.square(
+                        dimension: AppSizes.keyDigitHeight,
+                        child: NumpadKey(
+                          family: NumpadKeyFamily.functionKey,
+                          iconAsset: AppIcons.commentJump,
+                          height: AppSizes.keyDigitHeight,
+                          onPressed: () => _toggleCommentFocus(settings),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Bottom slot: either the custom numpad, or — while a comment is
@@ -295,19 +392,7 @@ class _CalculatorViewState extends State<_CalculatorView> {
                       onBackspace: cubit.backspace,
                       onClearAll: () => _onClearAll(context),
                       onCommit: cubit.commit,
-                      // "=" doesn't add a line (the total is live); it just
-                      // blurs the active row so the sheet reads as a settled
-                      // result. The next edit or tap re-engages it.
-                      onEquals: cubit.unfocus,
-                      onCommentJump: () {
-                        // Toggle between the comment (system keyboard) and the
-                        // amount (numpad).
-                        if (_commentFocus.hasFocus) {
-                          _commentFocus.unfocus();
-                        } else {
-                          _commentFocus.requestFocus();
-                        }
-                      },
+                      onEquals: cubit.insertSubtotal,
                     ),
                   ),
               ],
@@ -350,9 +435,16 @@ class _CalculatorViewState extends State<_CalculatorView> {
               );
             }
             final line = state.lines[index];
-            // After `=` the active line is blurred: nothing renders as the
-            // enlarged active row.
-            final active = index == state.activeIndex && state.focused;
+            if (line.isSubtotal) {
+              return SubtotalRow(
+                label: context.tr(LangKeys.subtotal),
+                totalText: _formatter.format(
+                  line.computedValue,
+                  decimalPlaces: decimalPlaces,
+                ),
+              );
+            }
+            final active = index == state.activeIndex;
             if (active) {
               return _ActiveLine(
                 line: line,
@@ -367,8 +459,7 @@ class _CalculatorViewState extends State<_CalculatorView> {
                 onAmountTap: () => _commentFocus.unfocus(),
               );
             }
-            // A blank line is only ever the (now blurred) trailing active line —
-            // hide it instead of rendering a stray "0" row.
+            // A blank continuation row is hidden only when it isn't active.
             if (line.isBlank) return const SizedBox.shrink();
             if (line.isSectionHeader) {
               return LedgerRow.sectionHeader(
@@ -376,12 +467,11 @@ class _CalculatorViewState extends State<_CalculatorView> {
                 onTap: () => cubit.setActive(index),
               );
             }
+            final display = _settledDisplay(line, decimalPlaces);
             return LedgerRow(
-              amountText: _settledAmount(line, decimalPlaces),
+              amountText: display.text,
               comment: line.comment,
-              isNegative:
-                  line.join == LedgerJoin.add &&
-                  line.computedValue < Decimal.zero,
+              isNegative: display.isNegative,
               isError: line.isHardError,
               excludedLabel: line.isHardError
                   ? context.tr(LangKeys.excluded)

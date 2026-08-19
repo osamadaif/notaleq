@@ -16,14 +16,16 @@ class SettingsCubit extends Cubit<SettingsState> {
   final SettingsRepository _repo;
 
   void _load() {
-    emit(SettingsState(
-      themeMode: AppThemeMode.fromString(_repo.themeMode),
-      soundEnabled: _repo.soundEnabled,
-      hapticEnabled: _repo.hapticEnabled,
-      decimalPlaces: _repo.decimalPlaces,
-      currencyCode: _repo.currencyCode,
-      languageCode: _repo.languageCode,
-    ));
+    emit(
+      SettingsState(
+        themeMode: AppThemeMode.fromString(_repo.themeMode),
+        soundEnabled: _repo.soundEnabled,
+        hapticEnabled: _repo.hapticEnabled,
+        decimalPlaces: _repo.decimalPlaces,
+        currencyCode: _repo.currencyCode,
+        languageCode: _repo.languageCode,
+      ),
+    );
   }
 
   /// Loads the real app version asynchronously; a failure just leaves it blank

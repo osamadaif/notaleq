@@ -76,6 +76,7 @@ class CalculatorRepository {
             LinesCompanion.insert(
               calculationId: calculationId,
               position: i,
+              entryType: Value(line.kind.name),
               rawExpression: Value(line.rawExpression),
               computedValue: Value(line.computedValue.toString()),
               comment: Value(line.comment),

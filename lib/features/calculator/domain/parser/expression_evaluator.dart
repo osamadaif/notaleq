@@ -113,10 +113,9 @@ class ExpressionEvaluator {
     }
   }
 
-  Decimal _percentOf(Decimal value) =>
-      (value / Decimal.fromInt(100)).toDecimal(
-        scaleOnInfinitePrecision: _divisionScale,
-      );
+  Decimal _percentOf(Decimal value) => (value / Decimal.fromInt(100)).toDecimal(
+    scaleOnInfinitePrecision: _divisionScale,
+  );
 
   // --- Tokenizer ---
 

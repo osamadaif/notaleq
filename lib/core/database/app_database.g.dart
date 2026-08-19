@@ -514,6 +514,18 @@ class $LinesTable extends Lines with TableInfo<$LinesTable, Line> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _entryTypeMeta = const VerificationMeta(
+    'entryType',
+  );
+  @override
+  late final GeneratedColumn<String> entryType = GeneratedColumn<String>(
+    'entry_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('expression'),
+  );
   static const VerificationMeta _rawExpressionMeta = const VerificationMeta(
     'rawExpression',
   );
@@ -566,6 +578,7 @@ class $LinesTable extends Lines with TableInfo<$LinesTable, Line> {
     id,
     calculationId,
     position,
+    entryType,
     rawExpression,
     computedValue,
     comment,
@@ -604,6 +617,12 @@ class $LinesTable extends Lines with TableInfo<$LinesTable, Line> {
       );
     } else if (isInserting) {
       context.missing(_positionMeta);
+    }
+    if (data.containsKey('entry_type')) {
+      context.handle(
+        _entryTypeMeta,
+        entryType.isAcceptableOrUnknown(data['entry_type']!, _entryTypeMeta),
+      );
     }
     if (data.containsKey('raw_expression')) {
       context.handle(
@@ -656,6 +675,10 @@ class $LinesTable extends Lines with TableInfo<$LinesTable, Line> {
         DriftSqlType.int,
         data['${effectivePrefix}position'],
       )!,
+      entryType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_type'],
+      )!,
       rawExpression: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}raw_expression'],
@@ -688,6 +711,9 @@ class Line extends DataClass implements Insertable<Line> {
   /// 0-based order within the sheet.
   final int position;
 
+  /// `expression` for a calculator row; `subtotal` for an `=` marker.
+  final String entryType;
+
   /// Exact tokens the user typed, e.g. "100+200*3". Source of truth.
   final String rawExpression;
 
@@ -703,6 +729,7 @@ class Line extends DataClass implements Insertable<Line> {
     required this.id,
     required this.calculationId,
     required this.position,
+    required this.entryType,
     required this.rawExpression,
     required this.computedValue,
     this.comment,
@@ -714,6 +741,7 @@ class Line extends DataClass implements Insertable<Line> {
     map['id'] = Variable<int>(id);
     map['calculation_id'] = Variable<int>(calculationId);
     map['position'] = Variable<int>(position);
+    map['entry_type'] = Variable<String>(entryType);
     map['raw_expression'] = Variable<String>(rawExpression);
     map['computed_value'] = Variable<String>(computedValue);
     if (!nullToAbsent || comment != null) {
@@ -728,6 +756,7 @@ class Line extends DataClass implements Insertable<Line> {
       id: Value(id),
       calculationId: Value(calculationId),
       position: Value(position),
+      entryType: Value(entryType),
       rawExpression: Value(rawExpression),
       computedValue: Value(computedValue),
       comment: comment == null && nullToAbsent
@@ -746,6 +775,7 @@ class Line extends DataClass implements Insertable<Line> {
       id: serializer.fromJson<int>(json['id']),
       calculationId: serializer.fromJson<int>(json['calculationId']),
       position: serializer.fromJson<int>(json['position']),
+      entryType: serializer.fromJson<String>(json['entryType']),
       rawExpression: serializer.fromJson<String>(json['rawExpression']),
       computedValue: serializer.fromJson<String>(json['computedValue']),
       comment: serializer.fromJson<String?>(json['comment']),
@@ -759,6 +789,7 @@ class Line extends DataClass implements Insertable<Line> {
       'id': serializer.toJson<int>(id),
       'calculationId': serializer.toJson<int>(calculationId),
       'position': serializer.toJson<int>(position),
+      'entryType': serializer.toJson<String>(entryType),
       'rawExpression': serializer.toJson<String>(rawExpression),
       'computedValue': serializer.toJson<String>(computedValue),
       'comment': serializer.toJson<String?>(comment),
@@ -770,6 +801,7 @@ class Line extends DataClass implements Insertable<Line> {
     int? id,
     int? calculationId,
     int? position,
+    String? entryType,
     String? rawExpression,
     String? computedValue,
     Value<String?> comment = const Value.absent(),
@@ -778,6 +810,7 @@ class Line extends DataClass implements Insertable<Line> {
     id: id ?? this.id,
     calculationId: calculationId ?? this.calculationId,
     position: position ?? this.position,
+    entryType: entryType ?? this.entryType,
     rawExpression: rawExpression ?? this.rawExpression,
     computedValue: computedValue ?? this.computedValue,
     comment: comment.present ? comment.value : this.comment,
@@ -790,6 +823,7 @@ class Line extends DataClass implements Insertable<Line> {
           ? data.calculationId.value
           : this.calculationId,
       position: data.position.present ? data.position.value : this.position,
+      entryType: data.entryType.present ? data.entryType.value : this.entryType,
       rawExpression: data.rawExpression.present
           ? data.rawExpression.value
           : this.rawExpression,
@@ -807,6 +841,7 @@ class Line extends DataClass implements Insertable<Line> {
           ..write('id: $id, ')
           ..write('calculationId: $calculationId, ')
           ..write('position: $position, ')
+          ..write('entryType: $entryType, ')
           ..write('rawExpression: $rawExpression, ')
           ..write('computedValue: $computedValue, ')
           ..write('comment: $comment, ')
@@ -820,6 +855,7 @@ class Line extends DataClass implements Insertable<Line> {
     id,
     calculationId,
     position,
+    entryType,
     rawExpression,
     computedValue,
     comment,
@@ -832,6 +868,7 @@ class Line extends DataClass implements Insertable<Line> {
           other.id == this.id &&
           other.calculationId == this.calculationId &&
           other.position == this.position &&
+          other.entryType == this.entryType &&
           other.rawExpression == this.rawExpression &&
           other.computedValue == this.computedValue &&
           other.comment == this.comment &&
@@ -842,6 +879,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
   final Value<int> id;
   final Value<int> calculationId;
   final Value<int> position;
+  final Value<String> entryType;
   final Value<String> rawExpression;
   final Value<String> computedValue;
   final Value<String?> comment;
@@ -850,6 +888,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
     this.id = const Value.absent(),
     this.calculationId = const Value.absent(),
     this.position = const Value.absent(),
+    this.entryType = const Value.absent(),
     this.rawExpression = const Value.absent(),
     this.computedValue = const Value.absent(),
     this.comment = const Value.absent(),
@@ -859,6 +898,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
     this.id = const Value.absent(),
     required int calculationId,
     required int position,
+    this.entryType = const Value.absent(),
     this.rawExpression = const Value.absent(),
     this.computedValue = const Value.absent(),
     this.comment = const Value.absent(),
@@ -869,6 +909,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
     Expression<int>? id,
     Expression<int>? calculationId,
     Expression<int>? position,
+    Expression<String>? entryType,
     Expression<String>? rawExpression,
     Expression<String>? computedValue,
     Expression<String>? comment,
@@ -878,6 +919,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
       if (id != null) 'id': id,
       if (calculationId != null) 'calculation_id': calculationId,
       if (position != null) 'position': position,
+      if (entryType != null) 'entry_type': entryType,
       if (rawExpression != null) 'raw_expression': rawExpression,
       if (computedValue != null) 'computed_value': computedValue,
       if (comment != null) 'comment': comment,
@@ -889,6 +931,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
     Value<int>? id,
     Value<int>? calculationId,
     Value<int>? position,
+    Value<String>? entryType,
     Value<String>? rawExpression,
     Value<String>? computedValue,
     Value<String?>? comment,
@@ -898,6 +941,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
       id: id ?? this.id,
       calculationId: calculationId ?? this.calculationId,
       position: position ?? this.position,
+      entryType: entryType ?? this.entryType,
       rawExpression: rawExpression ?? this.rawExpression,
       computedValue: computedValue ?? this.computedValue,
       comment: comment ?? this.comment,
@@ -916,6 +960,9 @@ class LinesCompanion extends UpdateCompanion<Line> {
     }
     if (position.present) {
       map['position'] = Variable<int>(position.value);
+    }
+    if (entryType.present) {
+      map['entry_type'] = Variable<String>(entryType.value);
     }
     if (rawExpression.present) {
       map['raw_expression'] = Variable<String>(rawExpression.value);
@@ -938,6 +985,7 @@ class LinesCompanion extends UpdateCompanion<Line> {
           ..write('id: $id, ')
           ..write('calculationId: $calculationId, ')
           ..write('position: $position, ')
+          ..write('entryType: $entryType, ')
           ..write('rawExpression: $rawExpression, ')
           ..write('computedValue: $computedValue, ')
           ..write('comment: $comment, ')
@@ -1318,6 +1366,7 @@ typedef $$LinesTableCreateCompanionBuilder =
       Value<int> id,
       required int calculationId,
       required int position,
+      Value<String> entryType,
       Value<String> rawExpression,
       Value<String> computedValue,
       Value<String?> comment,
@@ -1328,6 +1377,7 @@ typedef $$LinesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> calculationId,
       Value<int> position,
+      Value<String> entryType,
       Value<String> rawExpression,
       Value<String> computedValue,
       Value<String?> comment,
@@ -1373,6 +1423,11 @@ class $$LinesTableFilterComposer extends Composer<_$AppDatabase, $LinesTable> {
 
   ColumnFilters<int> get position => $composableBuilder(
     column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entryType => $composableBuilder(
+    column: $table.entryType,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1439,6 +1494,11 @@ class $$LinesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get entryType => $composableBuilder(
+    column: $table.entryType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get rawExpression => $composableBuilder(
     column: $table.rawExpression,
     builder: (column) => ColumnOrderings(column),
@@ -1497,6 +1557,9 @@ class $$LinesTableAnnotationComposer
 
   GeneratedColumn<int> get position =>
       $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<String> get entryType =>
+      $composableBuilder(column: $table.entryType, builder: (column) => column);
 
   GeneratedColumn<String> get rawExpression => $composableBuilder(
     column: $table.rawExpression,
@@ -1569,6 +1632,7 @@ class $$LinesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> calculationId = const Value.absent(),
                 Value<int> position = const Value.absent(),
+                Value<String> entryType = const Value.absent(),
                 Value<String> rawExpression = const Value.absent(),
                 Value<String> computedValue = const Value.absent(),
                 Value<String?> comment = const Value.absent(),
@@ -1577,6 +1641,7 @@ class $$LinesTableTableManager
                 id: id,
                 calculationId: calculationId,
                 position: position,
+                entryType: entryType,
                 rawExpression: rawExpression,
                 computedValue: computedValue,
                 comment: comment,
@@ -1587,6 +1652,7 @@ class $$LinesTableTableManager
                 Value<int> id = const Value.absent(),
                 required int calculationId,
                 required int position,
+                Value<String> entryType = const Value.absent(),
                 Value<String> rawExpression = const Value.absent(),
                 Value<String> computedValue = const Value.absent(),
                 Value<String?> comment = const Value.absent(),
@@ -1595,6 +1661,7 @@ class $$LinesTableTableManager
                 id: id,
                 calculationId: calculationId,
                 position: position,
+                entryType: entryType,
                 rawExpression: rawExpression,
                 computedValue: computedValue,
                 comment: comment,

@@ -10,18 +10,21 @@ part 'ledger_line.freezed.dart';
 /// (a bare number or a leading `+ / −` sign) is added as a signed value.
 enum LedgerJoin { add, mul, div }
 
+/// The two persisted row types in a ledger sheet.
+enum LedgerLineKind { expression, subtotal }
+
 /// One row of the ledger as the editor sees it (a non-DB domain entity).
 ///
 /// Built from a raw expression by the cubit via [ExpressionEvaluator]; persisted
 /// by the repository into the drift `lines` table. The [join] is derived from
 /// the leading operator of [rawExpression] (so the DB needs no extra column),
-/// and [computedValue] is the line's operand: the signed value for [LedgerJoin.add],
-/// or the magnitude for [LedgerJoin.mul] / [LedgerJoin.div].
+/// and [computedValue] is the expression operand or a subtotal's running value.
 @freezed
 sealed class LedgerLine with _$LedgerLine {
   const LedgerLine._();
 
   const factory LedgerLine({
+    @Default(LedgerLineKind.expression) LedgerLineKind kind,
     @Default('') String rawExpression,
     String? comment,
     @Default(LedgerJoin.add) LedgerJoin join,
@@ -33,6 +36,11 @@ sealed class LedgerLine with _$LedgerLine {
   /// An empty value line (created from a blank draft row).
   factory LedgerLine.empty() => LedgerLine(computedValue: Decimal.zero);
 
+  factory LedgerLine.subtotal(Decimal total) =>
+      LedgerLine(kind: LedgerLineKind.subtotal, computedValue: total);
+
+  bool get isSubtotal => kind == LedgerLineKind.subtotal;
+
   bool get hasExpression => rawExpression.trim().isNotEmpty;
 
   bool get hasComment => comment?.trim().isNotEmpty ?? false;
@@ -41,10 +49,10 @@ sealed class LedgerLine with _$LedgerLine {
   bool get isSectionHeader => !hasExpression && hasComment;
 
   /// Completely empty (no expression, no comment).
-  bool get isBlank => !hasExpression && !hasComment;
+  bool get isBlank => !isSubtotal && !hasExpression && !hasComment;
 
   /// Only valid value lines feed the running total.
-  bool get countsTowardTotal => hasExpression && !isError;
+  bool get countsTowardTotal => !isSubtotal && hasExpression && !isError;
 
   /// A real, user-visible error (red) vs. a still-incomplete line while typing.
   bool get isHardError =>

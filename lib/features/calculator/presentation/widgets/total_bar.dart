@@ -63,8 +63,9 @@ class TotalBar extends StatelessWidget {
                     SizedBox(width: AppSpacing.sm),
                     Text(
                       currency!,
-                      style:
-                          AppTextStyles.currency.copyWith(color: c.textMuted),
+                      style: AppTextStyles.currency.copyWith(
+                        color: c.textMuted,
+                      ),
                     ),
                   ],
                 ],

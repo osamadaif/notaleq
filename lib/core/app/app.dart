@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,14 +30,19 @@ class NotaleqApp extends StatelessWidget {
       child: ScreenUtilInit(
         designSize: const Size(360, 800),
         minTextAdapt: true,
-        builder: (context, child) =>
-            BlocBuilder<SettingsCubit, SettingsState>(
+        builder: (context, child) => BlocBuilder<SettingsCubit, SettingsState>(
           builder: (context, settings) => MaterialApp(
             title: 'Notaleq',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             themeMode: settings.themeMode,
+            builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+              value: AppTheme.systemUiOverlayStyle(
+                Theme.of(context).brightness,
+              ),
+              child: child!,
+            ),
             // Chosen language, or null to follow the device (see callback below).
             locale: settings.languageCode == null
                 ? null

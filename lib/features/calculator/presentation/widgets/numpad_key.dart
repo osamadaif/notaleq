@@ -7,7 +7,7 @@ import '../../../../core/style/app_text_styles.dart';
 import '../../../../core/widgets/app_icons.dart';
 
 /// The four key families from the design, each with a distinct visual weight.
-enum NumpadKeyFamily { digit, operatorKey, functionKey, commit }
+enum NumpadKeyFamily { digit, operatorKey, functionKey, subtotal, commit }
 
 /// A single, tactile numpad key.
 ///
@@ -114,11 +114,21 @@ class _NumpadKeyState extends State<NumpadKey> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: Text('↵', style: AppTextStyles.keyCommit.copyWith(fontSize: 24.sp, color: fg))),
+          Center(
+            child: Text(
+              '↵',
+              style: AppTextStyles.keyCommit.copyWith(
+                fontSize: 24.sp,
+                color: fg,
+              ),
+            ),
+          ),
           SizedBox(width: AppSpacing.sm),
           if (widget.label != null)
-            Text(widget.label!,
-                style: AppTextStyles.keyCommit.copyWith(color: fg)),
+            Text(
+              widget.label!,
+              style: AppTextStyles.keyCommit.copyWith(color: fg),
+            ),
         ],
       );
     }
@@ -136,6 +146,7 @@ class _NumpadKeyState extends State<NumpadKey> {
         return AppSizes.keyCommitHeight;
       case NumpadKeyFamily.digit:
       case NumpadKeyFamily.operatorKey:
+      case NumpadKeyFamily.subtotal:
         return AppSizes.keyDigitHeight;
     }
   }
@@ -159,6 +170,15 @@ class _NumpadKeyState extends State<NumpadKey> {
           fg: c.keyOperatorText,
           pressedFg: c.accentStrong,
           textStyle: AppTextStyles.keyOperator,
+        );
+      case NumpadKeyFamily.subtotal:
+        return _KeySpec(
+          bg: c.keyOperator,
+          pressedBg: c.keyOperatorPressed,
+          fg: c.keyOperatorText,
+          pressedFg: c.accentStrong,
+          textStyle: AppTextStyles.keyOperator,
+          border: Border.all(color: c.keyOperatorText, width: 1.5),
         );
       case NumpadKeyFamily.functionKey:
         return _KeySpec(

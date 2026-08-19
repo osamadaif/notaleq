@@ -14,15 +14,19 @@ class SheetDetailCubit extends Cubit<SheetDetailState> {
     emit(state.copyWith(status: SheetDetailStatus.loading));
     final result = await _repo.loadSheet(id);
     result.match(
-      (failure) => emit(state.copyWith(
-        status: SheetDetailStatus.error,
-        failureMessage: failure.message,
-      )),
-      (data) => emit(state.copyWith(
-        status: SheetDetailStatus.loaded,
-        sheet: data.calculation,
-        lines: data.lines,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: SheetDetailStatus.error,
+          failureMessage: failure.message,
+        ),
+      ),
+      (data) => emit(
+        state.copyWith(
+          status: SheetDetailStatus.loaded,
+          sheet: data.calculation,
+          lines: data.lines,
+        ),
+      ),
     );
   }
 }

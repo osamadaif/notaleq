@@ -20,4 +20,22 @@ void main() {
     expect(AppColors.light.appBg, isNot(AppColors.dark.appBg));
     expect(AppColors.light.accent, isNot(AppColors.dark.accent));
   });
+
+  test('status bar stays transparent with readable icons in both themes', () {
+    final expectedIconBrightness = <Brightness, Brightness>{
+      Brightness.light: Brightness.dark,
+      Brightness.dark: Brightness.light,
+    };
+
+    for (final themeBrightness in Brightness.values) {
+      final style = AppTheme.systemUiOverlayStyle(themeBrightness);
+      expect(style.statusBarColor, Colors.transparent);
+      expect(
+        style.statusBarIconBrightness,
+        expectedIconBrightness[themeBrightness],
+      );
+      expect(style.statusBarBrightness, themeBrightness);
+      expect(style.systemStatusBarContrastEnforced, isFalse);
+    }
+  });
 }

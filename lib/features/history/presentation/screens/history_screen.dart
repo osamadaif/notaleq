@@ -49,8 +49,9 @@ class _HistoryViewState extends State<_HistoryView> {
     super.dispose();
   }
 
-  String _date(int epochMillis) => DateFormat('yyyy/MM/dd · HH:mm')
-      .format(DateTime.fromMillisecondsSinceEpoch(epochMillis));
+  String _date(int epochMillis) => DateFormat(
+    'yyyy/MM/dd · HH:mm',
+  ).format(DateTime.fromMillisecondsSinceEpoch(epochMillis));
 
   Future<void> _delete(BuildContext context, Calculation sheet) async {
     final cubit = context.read<HistoryCubit>();
@@ -82,7 +83,11 @@ class _HistoryViewState extends State<_HistoryView> {
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm),
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
             child: SearchField(
               controller: _searchController,
               hint: context.tr(LangKeys.searchHint),
@@ -105,22 +110,25 @@ class _HistoryViewState extends State<_HistoryView> {
                   );
                 }
                 return ListView.separated(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm,
-                      AppSpacing.lg, AppSpacing.xl),
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.xl,
+                  ),
                   itemCount: state.sheets.length,
-                  separatorBuilder: (_, __) =>
-                      SizedBox(height: AppSpacing.sm),
+                  separatorBuilder: (_, __) => SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, index) {
                     final sheet = state.sheets[index];
                     return HistoryListItem(
                       name: sheet.name ?? '',
                       dateText: _date(sheet.updatedAt),
                       totalText: _formatter.format(
-                          Decimal.tryParse(sheet.cachedTotal) ?? Decimal.zero),
-                      onTap: () => Navigator.of(context).pushNamed(
-                        AppRoutes.sheetDetail,
-                        arguments: sheet.id,
+                        Decimal.tryParse(sheet.cachedTotal) ?? Decimal.zero,
                       ),
+                      onTap: () => Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.sheetDetail, arguments: sheet.id),
                       onDelete: () => _delete(context, sheet),
                     );
                   },

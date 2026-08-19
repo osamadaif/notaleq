@@ -17,10 +17,7 @@ mixin _$CalculatorState {
  CalcStatus get status; List<LedgerLine> get lines; int get activeIndex; int? get calculationId;/// Sheet name; null = unsaved draft.
  String? get sheetName; String? get currencyCode; int get decimalPlaces;/// True while the comment field of the active line has focus (system
 /// keyboard up, numpad swapped out).
- bool get commentEditing;/// Whether a line is currently focused (the enlarged, caret-lit active row).
-/// Pressing `=` blurs it (`false`) so the sheet reads as a settled result;
-/// any edit or tap re-engages it (`true`).
- bool get focused;/// Bumped each time a non-operator key is rejected on a line that still
+ bool get commentEditing;/// Bumped each time a non-operator key is rejected on a line that still
 /// needs a leading operator — the screen shows a quick notice.
  int get operatorNoticeTick; String? get failureMessage;
 /// Create a copy of CalculatorState
@@ -33,16 +30,16 @@ $CalculatorStateCopyWith<CalculatorState> get copyWith => _$CalculatorStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CalculatorState&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.lines, lines)&&(identical(other.activeIndex, activeIndex) || other.activeIndex == activeIndex)&&(identical(other.calculationId, calculationId) || other.calculationId == calculationId)&&(identical(other.sheetName, sheetName) || other.sheetName == sheetName)&&(identical(other.currencyCode, currencyCode) || other.currencyCode == currencyCode)&&(identical(other.decimalPlaces, decimalPlaces) || other.decimalPlaces == decimalPlaces)&&(identical(other.commentEditing, commentEditing) || other.commentEditing == commentEditing)&&(identical(other.focused, focused) || other.focused == focused)&&(identical(other.operatorNoticeTick, operatorNoticeTick) || other.operatorNoticeTick == operatorNoticeTick)&&(identical(other.failureMessage, failureMessage) || other.failureMessage == failureMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CalculatorState&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.lines, lines)&&(identical(other.activeIndex, activeIndex) || other.activeIndex == activeIndex)&&(identical(other.calculationId, calculationId) || other.calculationId == calculationId)&&(identical(other.sheetName, sheetName) || other.sheetName == sheetName)&&(identical(other.currencyCode, currencyCode) || other.currencyCode == currencyCode)&&(identical(other.decimalPlaces, decimalPlaces) || other.decimalPlaces == decimalPlaces)&&(identical(other.commentEditing, commentEditing) || other.commentEditing == commentEditing)&&(identical(other.operatorNoticeTick, operatorNoticeTick) || other.operatorNoticeTick == operatorNoticeTick)&&(identical(other.failureMessage, failureMessage) || other.failureMessage == failureMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,const DeepCollectionEquality().hash(lines),activeIndex,calculationId,sheetName,currencyCode,decimalPlaces,commentEditing,focused,operatorNoticeTick,failureMessage);
+int get hashCode => Object.hash(runtimeType,status,const DeepCollectionEquality().hash(lines),activeIndex,calculationId,sheetName,currencyCode,decimalPlaces,commentEditing,operatorNoticeTick,failureMessage);
 
 @override
 String toString() {
-  return 'CalculatorState(status: $status, lines: $lines, activeIndex: $activeIndex, calculationId: $calculationId, sheetName: $sheetName, currencyCode: $currencyCode, decimalPlaces: $decimalPlaces, commentEditing: $commentEditing, focused: $focused, operatorNoticeTick: $operatorNoticeTick, failureMessage: $failureMessage)';
+  return 'CalculatorState(status: $status, lines: $lines, activeIndex: $activeIndex, calculationId: $calculationId, sheetName: $sheetName, currencyCode: $currencyCode, decimalPlaces: $decimalPlaces, commentEditing: $commentEditing, operatorNoticeTick: $operatorNoticeTick, failureMessage: $failureMessage)';
 }
 
 
@@ -53,7 +50,7 @@ abstract mixin class $CalculatorStateCopyWith<$Res>  {
   factory $CalculatorStateCopyWith(CalculatorState value, $Res Function(CalculatorState) _then) = _$CalculatorStateCopyWithImpl;
 @useResult
 $Res call({
- CalcStatus status, List<LedgerLine> lines, int activeIndex, int? calculationId, String? sheetName, String? currencyCode, int decimalPlaces, bool commentEditing, bool focused, int operatorNoticeTick, String? failureMessage
+ CalcStatus status, List<LedgerLine> lines, int activeIndex, int? calculationId, String? sheetName, String? currencyCode, int decimalPlaces, bool commentEditing, int operatorNoticeTick, String? failureMessage
 });
 
 
@@ -70,7 +67,7 @@ class _$CalculatorStateCopyWithImpl<$Res>
 
 /// Create a copy of CalculatorState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? lines = null,Object? activeIndex = null,Object? calculationId = freezed,Object? sheetName = freezed,Object? currencyCode = freezed,Object? decimalPlaces = null,Object? commentEditing = null,Object? focused = null,Object? operatorNoticeTick = null,Object? failureMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? lines = null,Object? activeIndex = null,Object? calculationId = freezed,Object? sheetName = freezed,Object? currencyCode = freezed,Object? decimalPlaces = null,Object? commentEditing = null,Object? operatorNoticeTick = null,Object? failureMessage = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as CalcStatus,lines: null == lines ? _self.lines : lines // ignore: cast_nullable_to_non_nullable
@@ -80,7 +77,6 @@ as int?,sheetName: freezed == sheetName ? _self.sheetName : sheetName // ignore:
 as String?,currencyCode: freezed == currencyCode ? _self.currencyCode : currencyCode // ignore: cast_nullable_to_non_nullable
 as String?,decimalPlaces: null == decimalPlaces ? _self.decimalPlaces : decimalPlaces // ignore: cast_nullable_to_non_nullable
 as int,commentEditing: null == commentEditing ? _self.commentEditing : commentEditing // ignore: cast_nullable_to_non_nullable
-as bool,focused: null == focused ? _self.focused : focused // ignore: cast_nullable_to_non_nullable
 as bool,operatorNoticeTick: null == operatorNoticeTick ? _self.operatorNoticeTick : operatorNoticeTick // ignore: cast_nullable_to_non_nullable
 as int,failureMessage: freezed == failureMessage ? _self.failureMessage : failureMessage // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -165,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CalcStatus status,  List<LedgerLine> lines,  int activeIndex,  int? calculationId,  String? sheetName,  String? currencyCode,  int decimalPlaces,  bool commentEditing,  bool focused,  int operatorNoticeTick,  String? failureMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CalcStatus status,  List<LedgerLine> lines,  int activeIndex,  int? calculationId,  String? sheetName,  String? currencyCode,  int decimalPlaces,  bool commentEditing,  int operatorNoticeTick,  String? failureMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CalculatorState() when $default != null:
-return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_that.sheetName,_that.currencyCode,_that.decimalPlaces,_that.commentEditing,_that.focused,_that.operatorNoticeTick,_that.failureMessage);case _:
+return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_that.sheetName,_that.currencyCode,_that.decimalPlaces,_that.commentEditing,_that.operatorNoticeTick,_that.failureMessage);case _:
   return orElse();
 
 }
@@ -186,10 +182,10 @@ return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CalcStatus status,  List<LedgerLine> lines,  int activeIndex,  int? calculationId,  String? sheetName,  String? currencyCode,  int decimalPlaces,  bool commentEditing,  bool focused,  int operatorNoticeTick,  String? failureMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CalcStatus status,  List<LedgerLine> lines,  int activeIndex,  int? calculationId,  String? sheetName,  String? currencyCode,  int decimalPlaces,  bool commentEditing,  int operatorNoticeTick,  String? failureMessage)  $default,) {final _that = this;
 switch (_that) {
 case _CalculatorState():
-return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_that.sheetName,_that.currencyCode,_that.decimalPlaces,_that.commentEditing,_that.focused,_that.operatorNoticeTick,_that.failureMessage);}
+return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_that.sheetName,_that.currencyCode,_that.decimalPlaces,_that.commentEditing,_that.operatorNoticeTick,_that.failureMessage);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -203,10 +199,10 @@ return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CalcStatus status,  List<LedgerLine> lines,  int activeIndex,  int? calculationId,  String? sheetName,  String? currencyCode,  int decimalPlaces,  bool commentEditing,  bool focused,  int operatorNoticeTick,  String? failureMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CalcStatus status,  List<LedgerLine> lines,  int activeIndex,  int? calculationId,  String? sheetName,  String? currencyCode,  int decimalPlaces,  bool commentEditing,  int operatorNoticeTick,  String? failureMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _CalculatorState() when $default != null:
-return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_that.sheetName,_that.currencyCode,_that.decimalPlaces,_that.commentEditing,_that.focused,_that.operatorNoticeTick,_that.failureMessage);case _:
+return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_that.sheetName,_that.currencyCode,_that.decimalPlaces,_that.commentEditing,_that.operatorNoticeTick,_that.failureMessage);case _:
   return null;
 
 }
@@ -218,7 +214,7 @@ return $default(_that.status,_that.lines,_that.activeIndex,_that.calculationId,_
 
 
 class _CalculatorState extends CalculatorState {
-  const _CalculatorState({this.status = CalcStatus.loading, final  List<LedgerLine> lines = const <LedgerLine>[], this.activeIndex = 0, this.calculationId, this.sheetName, this.currencyCode, this.decimalPlaces = 2, this.commentEditing = false, this.focused = true, this.operatorNoticeTick = 0, this.failureMessage}): _lines = lines,super._();
+  const _CalculatorState({this.status = CalcStatus.loading, final  List<LedgerLine> lines = const <LedgerLine>[], this.activeIndex = 0, this.calculationId, this.sheetName, this.currencyCode, this.decimalPlaces = 2, this.commentEditing = false, this.operatorNoticeTick = 0, this.failureMessage}): _lines = lines,super._();
   
 
 @override@JsonKey() final  CalcStatus status;
@@ -238,10 +234,6 @@ class _CalculatorState extends CalculatorState {
 /// True while the comment field of the active line has focus (system
 /// keyboard up, numpad swapped out).
 @override@JsonKey() final  bool commentEditing;
-/// Whether a line is currently focused (the enlarged, caret-lit active row).
-/// Pressing `=` blurs it (`false`) so the sheet reads as a settled result;
-/// any edit or tap re-engages it (`true`).
-@override@JsonKey() final  bool focused;
 /// Bumped each time a non-operator key is rejected on a line that still
 /// needs a leading operator — the screen shows a quick notice.
 @override@JsonKey() final  int operatorNoticeTick;
@@ -257,16 +249,16 @@ _$CalculatorStateCopyWith<_CalculatorState> get copyWith => __$CalculatorStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CalculatorState&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._lines, _lines)&&(identical(other.activeIndex, activeIndex) || other.activeIndex == activeIndex)&&(identical(other.calculationId, calculationId) || other.calculationId == calculationId)&&(identical(other.sheetName, sheetName) || other.sheetName == sheetName)&&(identical(other.currencyCode, currencyCode) || other.currencyCode == currencyCode)&&(identical(other.decimalPlaces, decimalPlaces) || other.decimalPlaces == decimalPlaces)&&(identical(other.commentEditing, commentEditing) || other.commentEditing == commentEditing)&&(identical(other.focused, focused) || other.focused == focused)&&(identical(other.operatorNoticeTick, operatorNoticeTick) || other.operatorNoticeTick == operatorNoticeTick)&&(identical(other.failureMessage, failureMessage) || other.failureMessage == failureMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CalculatorState&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._lines, _lines)&&(identical(other.activeIndex, activeIndex) || other.activeIndex == activeIndex)&&(identical(other.calculationId, calculationId) || other.calculationId == calculationId)&&(identical(other.sheetName, sheetName) || other.sheetName == sheetName)&&(identical(other.currencyCode, currencyCode) || other.currencyCode == currencyCode)&&(identical(other.decimalPlaces, decimalPlaces) || other.decimalPlaces == decimalPlaces)&&(identical(other.commentEditing, commentEditing) || other.commentEditing == commentEditing)&&(identical(other.operatorNoticeTick, operatorNoticeTick) || other.operatorNoticeTick == operatorNoticeTick)&&(identical(other.failureMessage, failureMessage) || other.failureMessage == failureMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,const DeepCollectionEquality().hash(_lines),activeIndex,calculationId,sheetName,currencyCode,decimalPlaces,commentEditing,focused,operatorNoticeTick,failureMessage);
+int get hashCode => Object.hash(runtimeType,status,const DeepCollectionEquality().hash(_lines),activeIndex,calculationId,sheetName,currencyCode,decimalPlaces,commentEditing,operatorNoticeTick,failureMessage);
 
 @override
 String toString() {
-  return 'CalculatorState(status: $status, lines: $lines, activeIndex: $activeIndex, calculationId: $calculationId, sheetName: $sheetName, currencyCode: $currencyCode, decimalPlaces: $decimalPlaces, commentEditing: $commentEditing, focused: $focused, operatorNoticeTick: $operatorNoticeTick, failureMessage: $failureMessage)';
+  return 'CalculatorState(status: $status, lines: $lines, activeIndex: $activeIndex, calculationId: $calculationId, sheetName: $sheetName, currencyCode: $currencyCode, decimalPlaces: $decimalPlaces, commentEditing: $commentEditing, operatorNoticeTick: $operatorNoticeTick, failureMessage: $failureMessage)';
 }
 
 
@@ -277,7 +269,7 @@ abstract mixin class _$CalculatorStateCopyWith<$Res> implements $CalculatorState
   factory _$CalculatorStateCopyWith(_CalculatorState value, $Res Function(_CalculatorState) _then) = __$CalculatorStateCopyWithImpl;
 @override @useResult
 $Res call({
- CalcStatus status, List<LedgerLine> lines, int activeIndex, int? calculationId, String? sheetName, String? currencyCode, int decimalPlaces, bool commentEditing, bool focused, int operatorNoticeTick, String? failureMessage
+ CalcStatus status, List<LedgerLine> lines, int activeIndex, int? calculationId, String? sheetName, String? currencyCode, int decimalPlaces, bool commentEditing, int operatorNoticeTick, String? failureMessage
 });
 
 
@@ -294,7 +286,7 @@ class __$CalculatorStateCopyWithImpl<$Res>
 
 /// Create a copy of CalculatorState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? lines = null,Object? activeIndex = null,Object? calculationId = freezed,Object? sheetName = freezed,Object? currencyCode = freezed,Object? decimalPlaces = null,Object? commentEditing = null,Object? focused = null,Object? operatorNoticeTick = null,Object? failureMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? lines = null,Object? activeIndex = null,Object? calculationId = freezed,Object? sheetName = freezed,Object? currencyCode = freezed,Object? decimalPlaces = null,Object? commentEditing = null,Object? operatorNoticeTick = null,Object? failureMessage = freezed,}) {
   return _then(_CalculatorState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as CalcStatus,lines: null == lines ? _self._lines : lines // ignore: cast_nullable_to_non_nullable
@@ -304,7 +296,6 @@ as int?,sheetName: freezed == sheetName ? _self.sheetName : sheetName // ignore:
 as String?,currencyCode: freezed == currencyCode ? _self.currencyCode : currencyCode // ignore: cast_nullable_to_non_nullable
 as String?,decimalPlaces: null == decimalPlaces ? _self.decimalPlaces : decimalPlaces // ignore: cast_nullable_to_non_nullable
 as int,commentEditing: null == commentEditing ? _self.commentEditing : commentEditing // ignore: cast_nullable_to_non_nullable
-as bool,focused: null == focused ? _self.focused : focused // ignore: cast_nullable_to_non_nullable
 as bool,operatorNoticeTick: null == operatorNoticeTick ? _self.operatorNoticeTick : operatorNoticeTick // ignore: cast_nullable_to_non_nullable
 as int,failureMessage: freezed == failureMessage ? _self.failureMessage : failureMessage // ignore: cast_nullable_to_non_nullable
 as String?,

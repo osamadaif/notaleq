@@ -23,14 +23,16 @@ class HistoryCubit extends Cubit<HistoryState> {
   void _subscribe(String query) {
     _sub?.cancel();
     emit(state.copyWith(status: HistoryStatus.loading));
-    _sub = _repo.watchSheets(query).listen(
-      (sheets) => emit(
-        state.copyWith(status: HistoryStatus.loaded, sheets: sheets),
-      ),
-      onError: (Object e) => emit(
-        state.copyWith(status: HistoryStatus.error, failureMessage: '$e'),
-      ),
-    );
+    _sub = _repo
+        .watchSheets(query)
+        .listen(
+          (sheets) => emit(
+            state.copyWith(status: HistoryStatus.loaded, sheets: sheets),
+          ),
+          onError: (Object e) => emit(
+            state.copyWith(status: HistoryStatus.error, failureMessage: '$e'),
+          ),
+        );
   }
 
   Future<void> delete(int id) async {

@@ -79,8 +79,9 @@ class SecondaryButton extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Text(
             label,
-            style: AppTextStyles.button
-                .copyWith(color: destructive ? c.error : c.textSecondary),
+            style: AppTextStyles.button.copyWith(
+              color: destructive ? c.error : c.textSecondary,
+            ),
           ),
         ),
       ),

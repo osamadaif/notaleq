@@ -12,8 +12,7 @@ void main() {
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
-    cubit = HistoryCubit(
-        HistoryRepository(db.calculationsDao, db.linesDao));
+    cubit = HistoryCubit(HistoryRepository(db.calculationsDao, db.linesDao));
   });
 
   tearDown(() async {
@@ -66,29 +65,41 @@ void main() {
     expect(cubit.state.isEmpty, isTrue);
   });
 
-  test('loadSheet returns a saved sheet with its ordered lines (read-only)',
-      () async {
-    final repo = HistoryRepository(db.calculationsDao, db.linesDao);
-    final id = await savedSheet('مصاريف');
-    await db.linesDao.insertLine(LinesCompanion.insert(
-      calculationId: id,
-      position: 0,
-      rawExpression: const Value('100'),
-      computedValue: const Value('100'),
-    ));
+  test(
+    'loadSheet returns a saved sheet with its ordered lines (read-only)',
+    () async {
+      final repo = HistoryRepository(db.calculationsDao, db.linesDao);
+      final id = await savedSheet('مصاريف');
+      await db.linesDao.insertLine(
+        LinesCompanion.insert(
+          calculationId: id,
+          position: 0,
+          rawExpression: const Value('100'),
+          computedValue: const Value('100'),
+        ),
+      );
+      await db.linesDao.insertLine(
+        LinesCompanion.insert(
+          calculationId: id,
+          position: 1,
+          entryType: const Value('subtotal'),
+          computedValue: const Value('100'),
+        ),
+      );
 
-    final result = await repo.loadSheet(id);
-    result.match(
-      (f) => fail('expected success but got ${f.message}'),
-      (data) {
+      final result = await repo.loadSheet(id);
+      result.match((f) => fail('expected success but got ${f.message}'), (
+        data,
+      ) {
         expect(data.calculation.name, 'مصاريف');
-        expect(data.lines, hasLength(1));
+        expect(data.lines, hasLength(2));
         expect(data.lines.first.rawExpression, '100');
-      },
-    );
+        expect(data.lines.last.entryType, 'subtotal');
+      });
 
-    // Reading a saved sheet must not change it (still saved, still one line).
-    final still = await db.calculationsDao.getById(id);
-    expect(still!.isDraft, 0);
-  });
+      // Reading a saved sheet must not change it.
+      final still = await db.calculationsDao.getById(id);
+      expect(still!.isDraft, 0);
+    },
+  );
 }

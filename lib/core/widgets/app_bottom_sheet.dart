@@ -21,11 +21,7 @@ Future<T?> showAppBottomSheet<T>({
 }
 
 class AppBottomSheet extends StatelessWidget {
-  const AppBottomSheet({
-    super.key,
-    required this.title,
-    required this.child,
-  });
+  const AppBottomSheet({super.key, required this.title, required this.child});
 
   final String title;
   final Widget child;
@@ -36,8 +32,9 @@ class AppBottomSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: c.surface,
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppRadii.sheet)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadii.sheet),
+        ),
       ),
       padding: EdgeInsets.only(
         left: AppSpacing.xl,

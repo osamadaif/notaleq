@@ -11,7 +11,7 @@ import 'numpad_key.dart';
 /// never appear for amounts).
 ///
 /// Layout (Samsung-inspired): a compact function strip on top
-/// (✎to-comment · ( · ) · % · ⌫), digits in phone order with the operator
+/// (AC · ( · ) · % · ⌫), digits in phone order with the operator
 /// column weighted on the right, a wide accent commit bar + an "=" key.
 ///
 /// Pure presentation: it emits semantic key events; parsing and the
@@ -30,7 +30,6 @@ class Numpad extends StatelessWidget {
     this.onPercent,
     this.onClearAll,
     this.onBackspace,
-    this.onCommentJump,
     this.onCommit,
     this.onEquals,
     this.operatorsEnabled = true,
@@ -53,14 +52,11 @@ class Numpad extends StatelessWidget {
   final VoidCallback? onPercent;
   final VoidCallback? onClearAll;
   final VoidCallback? onBackspace;
-  final VoidCallback? onCommentJump;
 
   /// The wide commit bar — commits the line and descends to a new one.
   final VoidCallback? onCommit;
 
-  /// The `=` key. The running total is always live, so `=` settles nothing and
-  /// does **not** add a line; it's kept only for the muscle-memory tap at the
-  /// end (it still gives the usual key feedback).
+  /// The `=` key inserts a persisted subtotal below a valid expression.
   final VoidCallback? onEquals;
 
   final bool operatorsEnabled;
@@ -99,41 +95,52 @@ class Numpad extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Function strip: ✎ comment-jump · ( · ) · % · ⌫ backspace.
           Row(
             children: [
-              _cell(NumpadKey(
-                family: NumpadKeyFamily.functionKey,
-                iconAsset: AppIcons.commentJump,
-                onPressed: _tap(onCommentJump),
-              )),
+              _cell(
+                NumpadKey(
+                  family: NumpadKeyFamily.functionKey,
+                  label: 'AC',
+                  foreground: c.error,
+                  onPressed: _tap(onClearAll),
+                ),
+              ),
               const SizedBox(width: _gap),
-              _cell(NumpadKey(
-                family: NumpadKeyFamily.functionKey,
-                label: '(',
-                enabled: numbersEnabled,
-                onPressed: _tap(onParen == null ? null : () => onParen!('(')),
-              )),
+              _cell(
+                NumpadKey(
+                  family: NumpadKeyFamily.functionKey,
+                  label: '(',
+                  enabled: numbersEnabled,
+                  onPressed: _tap(onParen == null ? null : () => onParen!('(')),
+                ),
+              ),
               const SizedBox(width: _gap),
-              _cell(NumpadKey(
-                family: NumpadKeyFamily.functionKey,
-                label: ')',
-                enabled: numbersEnabled,
-                onPressed: _tap(onParen == null ? null : () => onParen!(')')),
-              )),
+              _cell(
+                NumpadKey(
+                  family: NumpadKeyFamily.functionKey,
+                  label: ')',
+                  enabled: numbersEnabled,
+                  onPressed: _tap(onParen == null ? null : () => onParen!(')')),
+                ),
+              ),
               const SizedBox(width: _gap),
-              _cell(NumpadKey(
-                family: NumpadKeyFamily.functionKey,
-                label: '%',
-                enabled: numbersEnabled,
-                onPressed: _tap(onPercent),
-              )),
+              _cell(
+                NumpadKey(
+                  family: NumpadKeyFamily.functionKey,
+                  label: '%',
+                  enabled: numbersEnabled,
+                  onPressed: _tap(onPercent),
+                ),
+              ),
               const SizedBox(width: _gap),
-              _cell(NumpadKey(
-                family: NumpadKeyFamily.functionKey,
-                iconAsset: AppIcons.backspace,
-                onPressed: _tap(onBackspace),
-              )),
+              _cell(
+                NumpadKey(
+                  family: NumpadKeyFamily.functionKey,
+                  iconAsset: AppIcons.backspace,
+                  foreground: c.error,
+                  onPressed: _tap(onBackspace),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: _gap),
@@ -143,16 +150,9 @@ class Numpad extends StatelessWidget {
           const SizedBox(height: _gap),
           _digitRow(['1', '2', '3'], '−'),
           const SizedBox(height: _gap),
-          // AC · 0 · . · +
           Row(
             children: [
-              _cell(NumpadKey(
-                family: NumpadKeyFamily.functionKey,
-                label: 'AC',
-                height: AppSizes.keyDigitHeight,
-                foreground: c.error,
-                onPressed: _tap(onClearAll),
-              )),
+              _cell(_doubleZero()),
               const SizedBox(width: _gap),
               _cell(_digit('0')),
               const SizedBox(width: _gap),
@@ -162,8 +162,6 @@ class Numpad extends StatelessWidget {
             ],
           ),
           const SizedBox(height: _gap),
-          // Commit bar: wide "new line" + an "=" key sitting under the "+".
-          // Only the wide bar adds a line; "=" is a no-op kept for habit.
           Row(
             children: [
               Expanded(
@@ -178,7 +176,7 @@ class Numpad extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: NumpadKey(
-                  family: NumpadKeyFamily.operatorKey,
+                  family: NumpadKeyFamily.subtotal,
                   label: '=',
                   height: AppSizes.keyCommitHeight,
                   onPressed: _tap(onEquals),
@@ -204,18 +202,32 @@ class Numpad extends StatelessWidget {
   }
 
   NumpadKey _digit(String d) => NumpadKey(
-        family: NumpadKeyFamily.digit,
-        label: d,
-        enabled: numbersEnabled,
-        onPressed: _tap(onDigit == null ? null : () => onDigit!(d)),
-      );
+    family: NumpadKeyFamily.digit,
+    label: d,
+    enabled: numbersEnabled,
+    onPressed: _tap(onDigit == null ? null : () => onDigit!(d)),
+  );
+
+  NumpadKey _doubleZero() => NumpadKey(
+    family: NumpadKeyFamily.digit,
+    label: '00',
+    enabled: numbersEnabled,
+    onPressed: _tap(
+      onDigit == null
+          ? null
+          : () {
+              onDigit!('0');
+              onDigit!('0');
+            },
+    ),
+  );
 
   NumpadKey _operator(String op) => NumpadKey(
-        family: NumpadKeyFamily.operatorKey,
-        label: op,
-        enabled: operatorsEnabled,
-        onPressed: _tap(onOperator == null ? null : () => onOperator!(op)),
-      );
+    family: NumpadKeyFamily.operatorKey,
+    label: op,
+    enabled: operatorsEnabled,
+    onPressed: _tap(onOperator == null ? null : () => onOperator!(op)),
+  );
 
   Widget _cell(Widget child) => Expanded(child: child);
 }
